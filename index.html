@@ -59,19 +59,14 @@
         .control-buttons button:hover {
             background-color: #e65c00;
         }
-        .calculate-button {
-            display: inline-block;
-            margin-top: 20px;
-        }
-        .calculate-button button {
-            background-color: #ff6f00;
-            color: white;
-            padding: 15px 30px;
-        }
-        .calculate-button button:hover {
-            background-color: #e65c00;
+        canvas {
+            display: block;
+            margin: 20px auto;
+            max-width: 90%;
         }
     </style>
+    <!-- Incluir Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h2>Calculadora de Parámetros de Rectificado</h2>
@@ -81,6 +76,7 @@
             <th>Configuración 1</th>
             <th>Configuración 2</th>
         </tr>
+        <!-- Diámetro de la muela -->
         <tr>
             <td>Diámetro de la muela (mm)</td>
             <td>
@@ -98,23 +94,25 @@
                 </div>
             </td>
         </tr>
+        <!-- RPM de la muela -->
         <tr>
             <td>RPM de la muela</td>
             <td>
                 <div class="control-buttons">
                     <button onclick="modificarValor('rpmMuela1', -100, 400, 1000)">-</button>
-                    <input type="number" id="rpmMuela1" value="800" oninput="calcular()">
+                    <input type="number" id="rpmMuela1" value="1000" oninput="calcular()">
                     <button onclick="modificarValor('rpmMuela1', 100, 400, 1000)">+</button>
                 </div>
             </td>
             <td>
                 <div class="control-buttons">
                     <button onclick="modificarValor('rpmMuela2', -100, 400, 1000)">-</button>
-                    <input type="number" id="rpmMuela2" value="800" oninput="calcular()">
+                    <input type="number" id="rpmMuela2" value="1000" oninput="calcular()">
                     <button onclick="modificarValor('rpmMuela2', 100, 400, 1000)">+</button>
                 </div>
             </td>
         </tr>
+        <!-- Diámetro de la pieza -->
         <tr>
             <td>Diámetro de la pieza (mm)</td>
             <td>
@@ -132,20 +130,39 @@
                 </div>
             </td>
         </tr>
+        <!-- Relación q -->
         <tr>
-            <td>RPM de la pieza</td>
+            <td>Relación de velocidad (q)</td>
             <td>
                 <div class="control-buttons">
-                    <button onclick="modificarValor('rpmPieza1', -1, 5, 60)">-</button>
-                    <input type="number" id="rpmPieza1" value="30" oninput="calcular()">
-                    <button onclick="modificarValor('rpmPieza1', 1, 5, 60)">+</button>
+                    <button onclick="modificarValor('relacionQ1', -1, 10, 150)">-</button>
+                    <input type="number" id="relacionQ1" value="60" step="1" oninput="calcular()">
+                    <button onclick="modificarValor('relacionQ1', 1, 10, 150)">+</button>
                 </div>
             </td>
             <td>
                 <div class="control-buttons">
-                    <button onclick="modificarValor('rpmPieza2', -1, 5, 60)">-</button>
-                    <input type="number" id="rpmPieza2" value="30" oninput="calcular()">
-                    <button onclick="modificarValor('rpmPieza2', 1, 5, 60)">+</button>
+                    <button onclick="modificarValor('relacionQ2', -1, 10, 150)">-</button>
+                    <input type="number" id="relacionQ2" value="60" step="1" oninput="calcular()">
+                    <button onclick="modificarValor('relacionQ2', 1, 10, 150)">+</button>
+                </div>
+            </td>
+        </tr>
+        <!-- Velocidad de avance (mm/min) -->
+        <tr>
+            <td>Velocidad de avance (mm/min)</td>
+            <td>
+                <div class="control-buttons">
+                    <button onclick="modificarValor('avanceMinuto1', -100, 100, 6000)">-</button>
+                    <input type="number" id="avanceMinuto1" value="3400" step="100" oninput="calcular()">
+                    <button onclick="modificarValor('avanceMinuto1', 100, 100, 6000)">+</button>
+                </div>
+            </td>
+            <td>
+                <div class="control-buttons">
+                    <button onclick="modificarValor('avanceMinuto2', -100, 100, 6000)">-</button>
+                    <input type="number" id="avanceMinuto2" value="2800" step="100" oninput="calcular()">
+                    <button onclick="modificarValor('avanceMinuto2', 100, 100, 6000)">+</button>
                 </div>
             </td>
         </tr>
@@ -164,16 +181,29 @@
             <td id="vc2"></td>
         </tr>
         <tr>
+            <td>RPM de la pieza</td>
+            <td id="rpmPiezaResultado1"></td>
+            <td id="rpmPiezaResultado2"></td>
+        </tr>
+        <tr>
             <td>Velocidad de la pieza (m/s)</td>
             <td id="vp1"></td>
             <td id="vp2"></td>
         </tr>
         <tr>
-            <td>Relación de velocidad (q)</td>
-            <td id="q1"></td>
-            <td id="q2"></td>
+            <td>Solapamiento (%)</td>
+            <td id="solapamiento1"></td>
+            <td id="solapamiento2"></td>
+        </tr>
+        <tr>
+            <td>Tiempo por pasada (min)</td>
+            <td id="tiempoPasada1"></td>
+            <td id="tiempoPasada2"></td>
         </tr>
     </table>
+
+    <h3>Gráfico de Resultados</h3>
+    <canvas id="resultChart"></canvas>
 
     <script>
         function calcular() {
@@ -181,25 +211,44 @@
                 return (Math.PI * diametro * rpm) / (60 * 1000);
             }
             function velocidadPieza(diametro, rpm) {
-                return (Math.PI * diametro * rpm) / (60 * 1000);
+                return (Math.PI * diametro * rpm) / 60000;
             }
-            function relacionVelocidad(vc, vp) {
-                return vc / vp;
+            function calcularRpmPieza(vc, q, diametroPieza) {
+                return (vc * 60000) / (q * Math.PI * diametroPieza);
             }
+            function solapamiento(anchoMuela, avanceMinuto, rpmPieza) {
+                const avancePorRevolucion = avanceMinuto / rpmPieza;
+                return (anchoMuela / avancePorRevolucion) * 100;
+            }
+            function tiempoPorPasada(desplazamiento, avanceMinuto) {
+                return desplazamiento / avanceMinuto;
+            }
+
             function calcularValores(sufijo) {
                 let diametroMuela = parseFloat(document.getElementById("diametroMuela" + sufijo).value);
                 let rpmMuela = parseFloat(document.getElementById("rpmMuela" + sufijo).value);
                 let diametroPieza = parseFloat(document.getElementById("diametroPieza" + sufijo).value);
-                let rpmPieza = parseFloat(document.getElementById("rpmPieza" + sufijo).value);
+                let relacionQ = parseFloat(document.getElementById("relacionQ" + sufijo).value);
+                let avanceMinuto = parseFloat(document.getElementById("avanceMinuto" + sufijo).value);
+
                 let vc = velocidadCorte(diametroMuela, rpmMuela);
+                let rpmPieza = calcularRpmPieza(vc, relacionQ, diametroPieza);
                 let vp = velocidadPieza(diametroPieza, rpmPieza);
-                let q = relacionVelocidad(vc, vp);
+                let solapamientoValue = solapamiento(100, avanceMinuto, rpmPieza); // Ancho de la muela = 100 mm
+                let tiempoPasada = tiempoPorPasada(1925, avanceMinuto); // Desplazamiento fijo de 1925 mm
+
                 document.getElementById("vc" + sufijo).innerText = vc.toFixed(2);
+                document.getElementById("rpmPiezaResultado" + sufijo).innerText = rpmPieza.toFixed(2);
                 document.getElementById("vp" + sufijo).innerText = vp.toFixed(2);
-                document.getElementById("q" + sufijo).innerText = q.toFixed(2);
+                document.getElementById("solapamiento" + sufijo).innerText = solapamientoValue.toFixed(2) + " %";
+                document.getElementById("tiempoPasada" + sufijo).innerText = tiempoPasada.toFixed(2);
             }
+
             calcularValores(1);
             calcularValores(2);
+
+            // Generar gráfico
+            generarGrafico();
         }
 
         function modificarValor(id, valor, min, max) {
@@ -207,7 +256,33 @@
             let nuevoValor = parseFloat(input.value) + valor;
             nuevoValor = Math.max(min, Math.min(max, nuevoValor));
             input.value = nuevoValor;
-            calcular(); // Actualizar resultados automáticamente
+            calcular();
+        }
+
+        function generarGrafico() {
+            const ctx = document.getElementById('resultChart').getContext('2d');
+            const data1 = parseFloat(document.getElementById("vc1").innerText) || 0;
+            const data2 = parseFloat(document.getElementById("vc2").innerText) || 0;
+
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Configuración 1', 'Configuración 2'],
+                    datasets: [{
+                        label: 'Velocidad de Corte (m/s)',
+                        data: [data1, data2],
+                        backgroundColor: ['#ff6f00', '#e65c00']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
 
         // Calcular al cargar la página
