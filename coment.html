@@ -189,12 +189,13 @@
         // 7. Renderizar el gráfico inicial
         renderizarGraficoLineas();
 
-        // 8. Manejar comentarios
+        // 8. Manejar comentarios con almacenamiento local
         const commentInput = document.getElementById('commentInput');
         const addCommentButton = document.getElementById('addComment');
         const commentsList = document.getElementById('commentsList');
 
-        const comments = []; // Almacenar comentarios
+        // Obtener comentarios almacenados en localStorage
+        let comments = JSON.parse(localStorage.getItem('comments')) || [];
 
         // Función para agregar un comentario
         function agregarComentario(comentario) {
@@ -203,16 +204,21 @@
             // Agregar el comentario al arreglo
             comments.push(comentario);
 
+            // Guardar los comentarios en localStorage
+            localStorage.setItem('comments', JSON.stringify(comments));
+
             // Actualizar la lista de comentarios
+            actualizarListaComentarios();
+        }
+
+        // Función para actualizar la lista de comentarios
+        function actualizarListaComentarios() {
             commentsList.innerHTML = '';
             comments.forEach((comment, index) => {
                 const li = document.createElement('li');
                 li.textContent = `${index + 1}. ${comment}`;
                 commentsList.appendChild(li);
             });
-
-            // Limpiar el campo de entrada
-            commentInput.value = '';
         }
 
         // Escuchar clic en el botón "Agregar Comentario"
@@ -228,6 +234,18 @@
                 agregarComentario(comentario);
             }
         });
+
+        // Limpiar el campo de entrada después de agregar un comentario
+        commentInput.addEventListener('input', () => {
+            if (commentInput.value.trim() !== '') {
+                commentInput.value = '';
+            }
+        });
+
+        // Cargar los comentarios guardados al cargar la página
+        window.onload = () => {
+            actualizarListaComentarios();
+        };
     </script>
 </body>
 </html>
