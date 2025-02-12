@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPM del Cilindro (q=20)</title>
+    <!-- Incluir Plotly desde un CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div id="heatmap" style="width: 900px; height: 600px;"></div>
+    <br>
+    <button id="download-button">Descargar Gráfico como Imagen</button>
+
+    <script>
+        // Parámetros
+        const D_m_values = Array.from({ length: 38 }, (_, i) => 550 + i * 10); // Diámetro de la muela (550 - 920 mm)
+        const D_p_values = Array.from({ length: 18 }, (_, i) => 619 + i * 5);  // Diámetro del cilindro (619 - 705 mm)
+        const N_m = 1000; // RPM de la muela fija
+        const q = 20;     // Relación de velocidad
+
+        // Calcular la matriz de RPM del cilindro
+        const rpm_cilindro = D_p_values.map(D_p =>
+            D_m_values.map(D_m => (N_m * D_m) / (q * D_p))
+        );
+
+        // Crear el heatmap con Plotly
+        const data = {
+            z: rpm_cilindro,
+            x: D_m_values,
+            y: D_p_values,
+            type: 'heatmap',
+            colorscale: 'Portland', // Esquema de colores similar a "coolwarm"
+            colorbar: {
+                title: 'RPM del Cilindro'
+            }
+        };
+
+        const layout = {
+            title: 'RPM del Cilindro necesarias para cumplir q=20',
+            xaxis: {
+                title: 'Diámetro de la Muela (mm)',
+                tickvals: D_m_values.filter((_, i) => i % 5 === 0), // Mostrar cada 5 valores
+                ticktext: D_m_values.filter((_, i) => i % 5 === 0).map(String)
+            },
+            yaxis: {
+                title: 'Diámetro del Cilindro (mm)',
+                tickvals: D_p_values.filter((_, i) => i % 2 === 0), // Mostrar cada 2 valores
+                ticktext: D_p_values.filter((_, i) => i % 2 === 0).map(String)
+            },
+            width: 900,
+            height: 600
+        };
+
+        // Renderizar el gráfico
+        Plotly.newPlot('heatmap', [data], layout);
+
+        // Función para descargar el gráfico como imagen
+        document.getElementById('download-button').addEventListener('click', function () {
+            Plotly.toImage(document.getElementById('heatmap'), {
+                format: 'png', // Formato de la imagen
+                width: 900,    // Ancho de la imagen
+                height: 600,   // Alto de la imagen
+                scale: 2       // Escala de la imagen (2x para mayor resolución)
+            }).then(function (url) {
+                // Crear un enlace temporal para descargar la imagen
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'rpm_cilindro_heatmap_q40.png'; // Nombre del archivo
+                link.click(); // Simular clic en el enlace
+            });
+        });
+    </script>
+</body>
+</html>
