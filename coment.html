@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Líneas - RPM del Cilindro</title>
+    <!-- Incluir Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #ff6f00;
+        }
+        #graph {
+            width: 90%;
+            height: 700px;
+            margin: 0 auto;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        .controls input[type="range"] {
+            width: 300px;
+        }
+        .controls span {
+            font-weight: bold;
+        }
+        .controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff6f00;
+            color: white;
+        }
+        .controls button:hover {
+            background-color: #e65c00;
+        }
+        .comment-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .comment-section textarea {
+            width: 80%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+        .comment-section button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+        }
+        .comment-section button:hover {
+            background-color: #218838;
+        }
+        .comments-list {
+            margin-top: 20px;
+            padding: 0;
+            list-style: none;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .comments-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .comments-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gráfico de Líneas - RPM del Cilindro (q=20)</h1>
+    <div id="graph"></div>
+    <div class="controls">
+        <div>
+            <input type="range" id="qSlider" min="10" max="50" value="20" step="1">
+            <label for="qSlider">Relación de Velocidad (q): <span id="qValue">20</span></label>
+        </div>
+        <button id="toggleLog">Escala Logarítmica</button>
+    </div>
+
+    <!-- Sección para comentarios -->
+    <div class="comment-section">
+        <textarea id="commentInput" placeholder="Escribe un comentario sobre el proceso..."></textarea>
+        <button id="addComment">Agregar Comentario</button>
+        <ul class="comments-list" id="commentsList"></ul>
+    </div>
+
+    <script>
+        // 1. Definir los valores de los diámetros
+        const D_m_values = []; // Diámetro de la muela (550 - 920 mm)
+        for (let i = 550; i <= 920; i += 10) {
+            D_m_values.push(i);
+        }
+        const D_p_values = []; // Diámetro del cilindro (619 - 705 mm)
+        for (let i = 619; i <= 705; i += 5) {
+            D_p_values.push(i);
+        }
+
+        // 2. Configurar la velocidad de la muela y el valor inicial de q
+        const N_m = 1000; // RPM de la muela
+        let q = 20;       // Relación de velocidad inicial
+
+        // 3. Función para calcular las RPM del cilindro
+        function calcularRpmCilindro(q) {
+            const rpm_cilindro = [];
+            for (let i = 0; i < D_p_values.length; i++) {
+                const row = [];
+                for (let j = 0; j < D_m_values.length; j++) {
+                    const rpm = (N_m * D_m_values[j]) / (q * D_p_values[i]);
+                    row.push(rpm);
+                }
+                rpm_cilindro.push(row);
+            }
+            return rpm_cilindro;
+        }
+
+        // 4. Función para generar el gráfico de líneas
+        function renderizarGraficoLineas(logScale = false) {
+            const rpm_cilindro = calcularRpmCilindro(q);
+
+            const data = D_p_values.map((d_p, i) => ({
+                x: D_m_values,
+                y: rpm_cilindro[i],
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Dp = ' + d_p + ' mm'
+            }));
+
+            const layout = {
+                title: 'Líneas - RPM del Cilindro (q=' + q + ')',
+                xaxis: { title: 'Diámetro de la Muela (mm)' },
+                yaxis: {
+                    title: 'RPM del Cilindro',
+                    type: logScale ? 'log' : 'linear'
+                },
+                margin: { l: 50, r: 50, b: 50, t: 50 },
+                width: 900,
+                height: 700
+            };
+
+            Plotly.newPlot('graph', data, layout);
+        }
+
+        // 5. Escuchar cambios en el control deslizante de q
+        const qSlider = document.getElementById('qSlider');
+        const qValue = document.getElementById('qValue');
+        qSlider.addEventListener('input', () => {
+            qValue.textContent = qSlider.value;
+            q = parseFloat(qSlider.value);
+            renderizarGraficoLineas(isLogScale);
+        });
+
+        // 6. Botón para alternar entre escala lineal y logarítmica
+        let isLogScale = false;
+        const toggleLogButton = document.getElementById('toggleLog');
+        toggleLogButton.addEventListener('click', () => {
+            isLogScale = !isLogScale;
+            toggleLogButton.textContent = isLogScale ? 'Escala Lineal' : 'Escala Logarítmica';
+            renderizarGraficoLineas(isLogScale);
+        });
+
+        // 7. Renderizar el gráfico inicial
+        renderizarGraficoLineas();
+
+        // 8. Manejar comentarios
+        const commentInput = document.getElementById('commentInput');
+        const addCommentButton = document.getElementById('addComment');
+        const commentsList = document.getElementById('commentsList');
+
+        const comments = []; // Almacenar comentarios
+
+        // Función para agregar un comentario
+        function agregarComentario(comentario) {
+            if (comentario.trim() === '') return;
+
+            // Agregar el comentario al arreglo
+            comments.push(comentario);
+
+            // Actualizar la lista de comentarios
+            commentsList.innerHTML = '';
+            comments.forEach((comment, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${comment}`;
+                commentsList.appendChild(li);
+            });
+
+            // Limpiar el campo de entrada
+            commentInput.value = '';
+        }
+
+        // Escuchar clic en el botón "Agregar Comentario"
+        addCommentButton.addEventListener('click', () => {
+            const comentario = commentInput.value.trim();
+            agregarComentario(comentario);
+        });
+
+        // Permitir agregar comentarios con Enter
+        commentInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const comentario = commentInput.value.trim();
+                agregarComentario(comentario);
+            }
+        });
+    </script>
+</body>
+</html>
