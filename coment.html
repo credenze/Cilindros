@@ -209,6 +209,9 @@
 
             // Actualizar la lista de comentarios
             actualizarListaComentarios();
+
+            // Limpiar el campo de entrada
+            commentInput.value = '';
         }
 
         // Función para actualizar la lista de comentarios
@@ -232,13 +235,6 @@
             if (event.key === 'Enter') {
                 const comentario = commentInput.value.trim();
                 agregarComentario(comentario);
-            }
-        });
-
-        // Limpiar el campo de entrada después de agregar un comentario
-        commentInput.addEventListener('input', () => {
-            if (commentInput.value.trim() !== '') {
-                commentInput.value = '';
             }
         });
 
