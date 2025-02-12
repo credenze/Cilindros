@@ -86,11 +86,26 @@
             background-color: white;
         }
         .comments-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
         .comments-list li:last-child {
             border-bottom: none;
+        }
+        .comments-list button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .comments-list button:hover {
+            background-color: #bd2130;
         }
     </style>
 </head>
@@ -209,19 +224,37 @@
 
             // Actualizar la lista de comentarios
             actualizarListaComentarios();
-
-            // Limpiar el campo de entrada
-            commentInput.value = '';
         }
 
         // Función para actualizar la lista de comentarios
         function actualizarListaComentarios() {
-            commentsList.innerHTML = '';
+            commentsList.innerHTML = ''; // Limpiar la lista actual
             comments.forEach((comment, index) => {
                 const li = document.createElement('li');
-                li.textContent = `${index + 1}. ${comment}`;
+                li.innerHTML = `
+                    ${index + 1}. ${comment}
+                    <button class="delete-comment" data-index="${index}">Eliminar</button>
+                `;
                 commentsList.appendChild(li);
             });
+
+            // Escuchar eventos de eliminación
+            const deleteButtons = document.querySelectorAll('.delete-comment');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = parseInt(button.getAttribute('data-index'));
+                    eliminarComentario(index);
+                });
+            });
+        }
+
+        // Función para eliminar un comentario
+        function eliminarComentario(index) {
+            if (index >= 0 && index < comments.length) {
+                comments.splice(index, 1); // Eliminar el comentario del arreglo
+                localStorage.setItem('comments', JSON.stringify(comments)); // Guardar cambios
+                actualizarListaComentarios(); // Actualizar la lista
+            }
         }
 
         // Escuchar clic en el botón "Agregar Comentario"
