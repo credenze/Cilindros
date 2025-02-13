@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Rectificado de Cilindros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .param-row label {
+            font-weight: bold;
+            width: 150px;
+        }
+        .param-row .value-container {
+            display: flex;
+            align-items: center;
+        }
+        .param-row input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            margin: 0 5px;
+            text-align: center;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Calculadora de Rectificado de Cilindros</h2>
+
+    <!-- Parámetros -->
+    <div class="param-row">
+        <label for="speedMuela">Velocidad Periférica Muela (m/s):</label>
+        <div class="value-container">
+            <button onclick="adjustValue('speedMuela', -1)">-</button>
+            <input type="number" id="speedMuela" value="40" step="0.1" oninput="updateResults()">
+            <button onclick="adjustValue('speedMuela', 1)">+</button>
+        </div>
+    </div>
+
+    <div class="param-row">
+        <label for="rpmCilindro">RPM del Cilindro:</label>
+        <div class="value-container">
+            <button onclick="adjustValue('rpmCilindro', -1">-</button>
+            <input type="number" id="rpmCilindro" value="35" step="1" oninput="updateResults()">
+            <button onclick="adjustValue('rpmCilindro', 1)">+</button>
+        </div>
+    </div>
+
+    <div class="param-row">
+        <label for="diameterCilindro">Diámetro del Cilindro (mm):</label>
+        <div class="value-container">
+            <button onclick="adjustValue('diameterCilindro', -10)">-</button>
+            <input type="number" id="diameterCilindro" value="650" step="0.1" oninput="updateResults()">
+            <button onclick="adjustValue('diameterCilindro', 10)">+</button>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    // Función para ajustar los valores mediante botones
+    function adjustValue(id, adjustment) {
+        const element = document.getElementById(id);
+        let currentValue = parseFloat(element.value);
+        let newValue = currentValue + adjustment;
+
+        // Validar que el nuevo valor sea positivo
+        if (newValue > 0) {
+            element.value = newValue.toFixed(1); // Mantener un decimal
+            updateResults(); // Actualizar resultados automáticamente
+        }
+    }
+
+    // Función para calcular y mostrar los resultados
+    function updateResults() {
+        // Obtener valores de entrada
+        const speedMuela = parseFloat(document.getElementById('speedMuela').value); // Velocidad periférica de muela (m/s)
+        const rpmCilindro = parseFloat(document.getElementById('rpmCilindro').value); // RPM del cilindro
+        const diameterCilindro = parseFloat(document.getElementById('diameterCilindro').value) / 1000; // Diámetro del cilindro en metros
+
+        // Validar entradas
+        if (isNaN(speedMuela) || isNaN(rpmCilindro) || isNaN(diameterCilindro)) {
+            document.getElementById('result').textContent = "Por favor, ingrese valores válidos.";
+            return;
+        }
+
+        // Calcular velocidad del cilindro en m/s
+        const speedCilindro = (rpmCilindro * Math.PI * diameterCilindro) / 60;
+
+        // Calcular relación Q
+        const relacionQ = speedMuela / speedCilindro;
+
+        // Mostrar resultados
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <p>Velocidad del Cilindro: ${speedCilindro.toFixed(3)} m/s</p>
+            <p>Relación Q: ${relacionQ.toFixed(2)}</p>
+        `;
+    }
+
+    // Inicializar la función de cálculo cuando se carga la página
+    window.onload = updateResults;
+</script>
+
+</body>
+</html>
