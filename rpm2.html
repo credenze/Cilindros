@@ -117,10 +117,13 @@
                 return;
             }
 
-            // Calcular velocidad de corte según el diámetro de la muela
-            let velocidadMuela = (Math.PI * diametroMuela * 1000) / 60; // Convertida a m/s
-            velocidadMuela = Math.min(velocidadMuela, 40); // Máximo 40 m/s
-            velocidadMuela = Math.max(velocidadMuela, 28); // Mínimo 28 m/s
+            // Calcular velocidad de corte según el diámetro y el límite de 1000 RPM
+            const rpmMax = 1000;
+            let velocidadMuela = ((Math.PI * diametroMuela * rpmMax) / 60) / 1000; // Convertir a m/s
+
+            // Máximo 40 m/s y mínimo 28 m/s
+            velocidadMuela = Math.min(velocidadMuela, 40);
+            velocidadMuela = Math.max(velocidadMuela, 28);
 
             // Mostrar la velocidad calculada
             document.getElementById("velocidadMuela").innerText = `${velocidadMuela.toFixed(1)} m/s`;
