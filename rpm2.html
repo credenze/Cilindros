@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de RPM</title>
+    <title>Calculadora de RPM Avanzada</title>
     <style>
+        :root {
+            --primary: #ff7200;
+            --background: #222;
+            --surface: #333;
+            --text: #ddd;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #222;
-            color: #ddd;
+            background: var(--background);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -16,155 +23,257 @@
             margin: 0;
             padding: 20px;
         }
-        h1 {
-            color: #ff7200;
-        }
+
         .container {
-            max-width: 400px;
-            background: #333;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            max-width: 450px;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
+
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
-        .input-group label {
-            font-weight: bold;
+
+        .input-label {
             display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
-        .controls {
+
+        .input-wrapper {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-top: 5px;
+            gap: 0.5rem;
+            justify-content: center;
         }
-        .controls button {
-            width: 30px;
-            height: 30px;
-            background-color: #ff7200;
-            color: white;
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
             border: none;
             border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .controls button:hover {
-            background-color: #e56300;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #777;
-            border-radius: 4px;
-            background-color: #444;
             color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
         }
-        .results {
-            margin-top: 20px;
-            padding: 15px;
+
+        .control-btn:hover {
+            background: #e56300;
+            transform: scale(1.1);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .value-input {
+            width: 100px;
+            padding: 0.8rem;
+            text-align: center;
             background: #444;
+            border: 2px solid #555;
+            border-radius: 6px;
+            color: white;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+
+        .value-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .results {
+            background: #444;
+            padding: 1.5rem;
             border-radius: 8px;
-            font-size: 16px;
+            margin-top: 1.5rem;
+        }
+
+        .result-item {
+            margin: 0.8rem 0;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            margin-top: 1rem;
+            text-align: center;
+            min-height: 1.5rem;
+        }
+
+        .info-text {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Nuevo estilo para centrar velocidad */
+        .velocity-container {
+            text-align: center;
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
-
-    <h1>Calculadora de RPM</h1>
-
     <div class="container">
         <!-- Diámetro de la Muela -->
         <div class="input-group">
-            <label for="diametroMuela">Diámetro de la Muela (mm):</label>
-            <div class="controls">
-                <button onclick="modificarValor('diametroMuela', 5)">+</button>
-                <input type="number" id="diametroMuela" value="915" step="1" min="550" max="915" oninput="calcularRPM()">
-                <button onclick="modificarValor('diametroMuela', -5)">-</button>
+            <label class="input-label" for="diametroMuela">Diámetro de la muela (mm)</label>
+            <div class="input-wrapper">
+                <button class="control-btn" 
+                        onmousedown="startAdjustment('diametroMuela', -5)"
+                        onmouseup="stopAdjustment()"
+                        onmouseleave="stopAdjustment()"
+                        ontouchstart="startAdjustment('diametroMuela', -5)"
+                        ontouchend="stopAdjustment()">-</button>
+                <input class="value-input" type="number" id="diametroMuela" 
+                       min="550" max="915" step="5" value="915"
+                       oninput="validateInput(this, 550, 915)">
+                <button class="control-btn" 
+                        onmousedown="startAdjustment('diametroMuela', 5)"
+                        onmouseup="stopAdjustment()"
+                        onmouseleave="stopAdjustment()"
+                        ontouchstart="startAdjustment('diametroMuela', 5)"
+                        ontouchend="stopAdjustment()">+</button>
             </div>
+            <div class="info-text">Rango permitido: 550-915 mm</div>
         </div>
 
-        <!-- Velocidad de la Muela -->
+        <!-- Velocidad de Corte Centrada -->
         <div class="input-group">
-            <label>Velocidad de Corte (m/s):</label>
-            <p id="velocidadMuela" style="font-weight: bold; color: #ff7200;">40 m/s</p>
+            <div class="velocity-container">
+                <div class="input-label">Velocidad de corte calculada</div>
+                <input class="value-input" type="text" id="velocidadMuela" 
+                       value="40 m/s" readonly 
+                       style="display: block; margin: 0 auto;">
+                <div class="info-text">Límites: 28-40 m/s</div>
+            </div>
         </div>
 
         <!-- Diámetro del Cilindro -->
         <div class="input-group">
-            <label for="diametroCilindro">Diámetro del Cilindro (mm):</label>
-            <div class="controls">
-                <button onclick="modificarValor('diametroCilindro', 1)">+</button>
-                <input type="number" id="diametroCilindro" value="650" step="1" oninput="calcularRPM()">
-                <button onclick="modificarValor('diametroCilindro', -1)">-</button>
+            <label class="input-label" for="diametroCilindro">Diámetro del cilindro (mm)</label>
+            <div class="input-wrapper">
+                <button class="control-btn" 
+                        onmousedown="startAdjustment('diametroCilindro', -1)"
+                        onmouseup="stopAdjustment()"
+                        onmouseleave="stopAdjustment()"
+                        ontouchstart="startAdjustment('diametroCilindro', -1)"
+                        ontouchend="stopAdjustment()">-</button>
+                <input class="value-input" type="number" id="diametroCilindro" 
+                       min="619” max=“705" step="1" value="650"
+                       oninput="validateInput(this, 1)">
+                <button class="control-btn" 
+                        onmousedown="startAdjustment('diametroCilindro', 1)"
+                        onmouseup="stopAdjustment()"
+                        onmouseleave="stopAdjustment()"
+                        ontouchstart="startAdjustment('diametroCilindro', 1)"
+                        ontouchend="stopAdjustment()">+</button>
             </div>
         </div>
 
         <!-- Resultados -->
-        <div class="results" id="results"></div>
+        <div class="results">
+            <div class="result-item">
+                RPM para HSSA (Q35): <strong id="rpmHSSA">-</strong>
+            </div>
+            <div class="result-item">
+                RPM para FDTI (Q30): <strong id="rpmFDTI">-</strong>
+            </div>
+        </div>
+
+        <div class="error-message" id="error" aria-live="polite"></div>
     </div>
 
     <script>
-        function calcularRPM() {
-            const diametroMuela = parseFloat(document.getElementById("diametroMuela").value);
-            const diametroCilindro = parseFloat(document.getElementById("diametroCilindro").value) / 1000; // Convertir a metros
-
-            if (isNaN(diametroMuela) || isNaN(diametroCilindro) || diametroCilindro <= 0) {
-                mostrarResultado("Ingresa valores válidos.");
-                return;
+        const config = {
+            V_MAX: 40,
+            V_MIN: 28,
+            RPM_MAX: 1000,
+            DIAMETRO: {
+                MIN_MUELA: 550,
+                MAX_MUELA: 915,
+                MIN_CILINDRO: 1
             }
+        };
 
-            // Calcular velocidad de corte según el diámetro y el límite de 1000 RPM
-            const rpmMax = 1000;
-            let velocidadMuela = ((Math.PI * diametroMuela * rpmMax) / 60) / 1000; // Convertir a m/s
+        let intervalId;
+        let timeoutId;
 
-            // Máximo 40 m/s y mínimo 28 m/s
-            velocidadMuela = Math.min(velocidadMuela, 40);
-            velocidadMuela = Math.max(velocidadMuela, 28);
-
-            // Mostrar la velocidad calculada
-            document.getElementById("velocidadMuela").innerText = `${velocidadMuela.toFixed(1)} m/s`;
-
-            // Calcular RPM para HSSA (Q = 35) y FDTI (Q = 30)
-            const rpmHSSA = calcularRPMParaQ(velocidadMuela, diametroCilindro, 35);
-            const rpmFDTI = calcularRPMParaQ(velocidadMuela, diametroCilindro, 30);
-
-            // Mostrar resultados
-            const resultados = `
-                <p><strong>RPM para HSSA (Q = 35):</strong> ${rpmHSSA.toFixed(2)} RPM</p>
-                <p><strong>RPM para FDTI (Q = 30):</strong> ${rpmFDTI.toFixed(2)} RPM</p>
-            `;
-            mostrarResultado(resultados);
+        function startAdjustment(elementId, delta) {
+            adjustValue(elementId, delta); // Primer ajuste inmediato
+            
+            timeoutId = setTimeout(() => {
+                intervalId = setInterval(() => {
+                    adjustValue(elementId, delta);
+                }, 100); // Repetición cada 100ms
+            }, 300); // Delay inicial de 300ms
         }
 
-        function calcularRPMParaQ(vMuela, diametroCilindro, Q) {
-            return (vMuela * 60) / (Q * Math.PI * diametroCilindro);
+        function stopAdjustment() {
+            clearTimeout(timeoutId);
+            clearInterval(intervalId);
         }
 
-        function mostrarResultado(mensaje) {
-            document.getElementById("results").innerHTML = mensaje;
+        function validateInput(input, min, max = Infinity) {
+            let value = parseFloat(input.value);
+            if (isNaN(value)) value = min;
+            
+            value = Math.max(min, Math.min(value, max));
+            input.value = value;
+            
+            calculateRPM();
         }
 
-        function modificarValor(id, cambio) {
-            const input = document.getElementById(id);
-            let nuevoValor = parseFloat(input.value) + cambio;
+        function adjustValue(elementId, delta) {
+            const input = document.getElementById(elementId);
+            const step = parseFloat(input.step) || 1;
+            const newValue = parseFloat(input.value) + (delta * step);
+            
+            input.value = Math.max(
+                parseFloat(input.min) || -Infinity,
+                Math.min(newValue, parseFloat(input.max) || Infinity)
+            );
+            
+            calculateRPM();
+        }
 
-            // Rango para la muela: 550 mm a 915 mm
-            if (id === "diametroMuela") {
-                nuevoValor = Math.max(550, Math.min(915, nuevoValor));
+        function calculateRPM() {
+            try {
+                const diametroMuela = parseFloat(document.getElementById('diametroMuela').value);
+                const diametroCilindro = parseFloat(document.getElementById('diametroCilindro').value) / 1000;
+
+                let velocidadCalculada = (Math.PI * diametroMuela * config.RPM_MAX) / 60000;
+                velocidadCalculada = Math.min(config.V_MAX, Math.max(config.V_MIN, velocidadCalculada));
+
+                document.getElementById('velocidadMuela').value = `${velocidadCalculada.toFixed(1)} m/s`;
+
+                const rpmHSSA = (velocidadCalculada * 60) / (35 * Math.PI * diametroCilindro);
+                const rpmFDTI = (velocidadCalculada * 60) / (30 * Math.PI * diametroCilindro);
+
+                document.getElementById('rpmHSSA').textContent = Math.round(rpmHSSA);
+                document.getElementById('rpmFDTI').textContent = Math.round(rpmFDTI);
+                document.getElementById('error').textContent = '';
+                
+            } catch (error) {
+                showError('Error en los cálculos. Verifique los valores ingresados.');
             }
-
-            if (nuevoValor > 0) {
-                input.value = nuevoValor;
-                calcularRPM();
-            }
         }
 
-        window.onload = calcularRPM;
+        function showError(message) {
+            const errorElement = document.getElementById('error');
+            errorElement.textContent = message;
+            setTimeout(() => errorElement.textContent = '', 5000);
+        }
+
+        // Inicialización
+        calculateRPM();
     </script>
-
 </body>
 </html>
