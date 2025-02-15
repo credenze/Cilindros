@@ -7,127 +7,145 @@
     <style>
         /* Estilos generales */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
+            background-color: #1e1e1e;
+            color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
+            text-align: center;
         }
 
         h1 {
-            text-align: center;
             color: #ff7200;
-            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 24px;
         }
 
         .container {
-            width: 100%;
-            max-width: 400px;
-            background: #fff;
+            width: 90%;
+            max-width: 450px;
+            background: #292929;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
         .input-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
         }
 
         .input-group label {
-            flex: 1;
-            font-weight: bold;
-            margin-right: 10px;
-            text-align: right;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
         }
 
-        .input-group input[type="number"] {
-            flex: 2;
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls button {
+            width: 35px;
+            height: 35px;
+            background-color: #ff7200;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: #e56300;
+            transform: scale(1.1);
+        }
+
+        .controls input {
+            width: 80px;
             padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
             text-align: center;
+            margin: 0 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            pointer-events: none; /* Desactiva el teclado en móviles */
         }
 
         .results {
             margin-top: 20px;
             padding: 15px;
-            background: #f8f8f8;
+            background: #444;
             border-radius: 8px;
-            text-align: center;
-            font-size: 16px;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .results p {
-            margin: 5px 0;
-        }
-
-        /* Responsive design */
-        @media (max-width: 480px) {
-            .input-group {
-                flex-wrap: wrap;
-            }
-            .input-group label {
-                flex: 100%;
-                text-align: left;
-                margin-bottom: 5px;
-            }
-            .input-group input[type="number"] {
-                flex: 100%;
-                margin-top: 5px;
-            }
+            margin: 8px 0;
         }
     </style>
 </head>
 <body>
 
-    <h1>Calculadora de RPM para Rectificado</h1>
+    <h1>⚙️ Calculadora de RPM para Rectificado</h1>
 
     <div class="container">
         <!-- Velocidad de la Muela -->
         <div class="input-group">
-            <label for="velocidadMuela">Velocidad de la Muela (m/s):</label>
-            <input type="number" id="velocidadMuela" value="48.3" step="0.1" oninput="calcularRPM()">
+            <label for="velocidadMuela">🔄 Velocidad de la Muela (m/s):</label>
+            <div class="controls">
+                <button onclick="modificarValor('velocidadMuela', 0.5)">+</button>
+                <input type="text" id="velocidadMuela" value="38">
+                <button onclick="modificarValor('velocidadMuela', -0.5)">-</button>
+            </div>
         </div>
 
         <!-- Diámetro del Cilindro -->
         <div class="input-group">
-            <label for="diametroCilindro">Diámetro del Cilindro (mm):</label>
-            <input type="number" id="diametroCilindro" value="705" step="0.1" oninput="calcularRPM()">
+            <label for="diametroCilindro">📏 Diámetro del Cilindro (mm):</label>
+            <div class="controls">
+                <button onclick="modificarValor('diametroCilindro', 5)">+</button>
+                <input type="text" id="diametroCilindro" value="650">
+                <button onclick="modificarValor('diametroCilindro', -5)">-</button>
+            </div>
         </div>
 
         <!-- Resultados -->
-        <div class="results" id="results"></div>
+        <div class="results" id="results">📊 Resultados aparecerán aquí...</div>
     </div>
 
     <script>
-        // Función principal para calcular RPM
+        // Función para calcular RPM
         function calcularRPM() {
-            // Obtener valores de entrada
-            const velocidadMuela = parseFloat(document.getElementById("velocidadMuela").value); // Velocidad de la muela (m/s)
-            const diametroCilindro = parseFloat(document.getElementById("diametroCilindro").value) / 1000; // Convertir a metros
+            const velocidadMuela = parseFloat(document.getElementById("velocidadMuela").value);
+            const diametroCilindro = parseFloat(document.getElementById("diametroCilindro").value) / 1000; 
 
-            // Validar entradas
             if (isNaN(velocidadMuela) || isNaN(diametroCilindro) || velocidadMuela <= 0 || diametroCilindro <= 0) {
-                mostrarResultado("Por favor, ingresa valores válidos.");
+                mostrarResultado("⚠️ Introduce valores válidos.");
                 return;
             }
 
-            // Calcular RPM para HSSA (Q = 35)
+            // Cálculo de RPM para distintos valores de Q
             const rpmHSSA = calcularRPMParaQ(velocidadMuela, diametroCilindro, 35);
-
-            // Calcular RPM para FDTI (Q = 30)
             const rpmFDTI = calcularRPMParaQ(velocidadMuela, diametroCilindro, 30);
 
             // Mostrar resultados
             const resultados = `
-                <p><strong>RPM para HSSA (Q = 35):</strong> ${rpmHSSA.toFixed(2)} RPM</p>
-                <p><strong>RPM para FDTI (Q = 30):</strong> ${rpmFDTI.toFixed(2)} RPM</p>
+                <p>🛠 <strong>RPM para HSSA (Q = 35):</strong> <br> <span style="color:#ff7200;">${rpmHSSA.toFixed(2)} RPM</span></p>
+                <p>⚙️ <strong>RPM para FDTI (Q = 30):</strong> <br> <span style="color:#ff7200;">${rpmFDTI.toFixed(2)} RPM</span></p>
             `;
 
             mostrarResultado(resultados);
@@ -138,16 +156,24 @@
             return (vMuela * 60) / (Q * Math.PI * diametroCilindro);
         }
 
-        // Función para mostrar resultados
+        // Mostrar resultados en la pantalla
         function mostrarResultado(mensaje) {
-            const resultsDiv = document.getElementById("results");
-            resultsDiv.innerHTML = mensaje;
+            document.getElementById("results").innerHTML = mensaje;
         }
 
-        // Iniciar cálculo al cargar la página
-        window.onload = function () {
-            calcularRPM(); // Calcula los valores iniciales cuando se carga la página
-        };
+        // Modificar valores con botones y evitar que el teclado se abra
+        function modificarValor(id, cantidad) {
+            const input = document.getElementById(id);
+            let nuevoValor = parseFloat(input.value) + cantidad;
+
+            if (nuevoValor > 0) {
+                input.value = nuevoValor.toFixed(2);  // Redondea a 2 decimales
+                calcularRPM(); // Calcula automáticamente
+            }
+        }
+
+        // Calcular al cargar la página
+        window.onload = calcularRPM;
     </script>
 
 </body>
