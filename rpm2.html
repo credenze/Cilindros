@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de RPM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff7200;
+        }
+        .container {
+            max-width: 400px;
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            font-weight: bold;
+            display: block;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .controls button {
+            width: 30px;
+            height: 30px;
+            background-color: #ff7200;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .controls button:hover {
+            background-color: #e56300;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #777;
+            border-radius: 4px;
+            background-color: #444;
+            color: white;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #444;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calculadora de RPM</h1>
+
+    <div class="container">
+        <!-- Diámetro de la Muela -->
+        <div class="input-group">
+            <label for="diametroMuela">Diámetro de la Muela (mm):</label>
+            <div class="controls">
+                <button onclick="modificarValor('diametroMuela', 5)">+</button>
+                <input type="number" id="diametroMuela" value="915" step="1" min="550" max="915" oninput="calcularRPM()">
+                <button onclick="modificarValor('diametroMuela', -5)">-</button>
+            </div>
+        </div>
+
+        <!-- Velocidad de la Muela -->
+        <div class="input-group">
+            <label>Velocidad de Corte (m/s):</label>
+            <p id="velocidadMuela" style="font-weight: bold; color: #ff7200;">40 m/s</p>
+        </div>
+
+        <!-- Diámetro del Cilindro -->
+        <div class="input-group">
+            <label for="diametroCilindro">Diámetro del Cilindro (mm):</label>
+            <div class="controls">
+                <button onclick="modificarValor('diametroCilindro', 1)">+</button>
+                <input type="number" id="diametroCilindro" value="650" step="1" oninput="calcularRPM()">
+                <button onclick="modificarValor('diametroCilindro', -1)">-</button>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        function calcularRPM() {
+            const diametroMuela = parseFloat(document.getElementById("diametroMuela").value);
+            const diametroCilindro = parseFloat(document.getElementById("diametroCilindro").value) / 1000; // Convertir a metros
+
+            if (isNaN(diametroMuela) || isNaN(diametroCilindro) || diametroCilindro <= 0) {
+                mostrarResultado("Ingresa valores válidos.");
+                return;
+            }
+
+            // Calcular velocidad de corte según el diámetro de la muela
+            let velocidadMuela = (Math.PI * diametroMuela * 1000) / 60; // Convertida a m/s
+            velocidadMuela = Math.min(velocidadMuela, 40); // Máximo 40 m/s
+            velocidadMuela = Math.max(velocidadMuela, 28); // Mínimo 28 m/s
+
+            // Mostrar la velocidad calculada
+            document.getElementById("velocidadMuela").innerText = `${velocidadMuela.toFixed(1)} m/s`;
+
+            // Calcular RPM para HSSA (Q = 35) y FDTI (Q = 30)
+            const rpmHSSA = calcularRPMParaQ(velocidadMuela, diametroCilindro, 35);
+            const rpmFDTI = calcularRPMParaQ(velocidadMuela, diametroCilindro, 30);
+
+            // Mostrar resultados
+            const resultados = `
+                <p><strong>RPM para HSSA (Q = 35):</strong> ${rpmHSSA.toFixed(2)} RPM</p>
+                <p><strong>RPM para FDTI (Q = 30):</strong> ${rpmFDTI.toFixed(2)} RPM</p>
+            `;
+            mostrarResultado(resultados);
+        }
+
+        function calcularRPMParaQ(vMuela, diametroCilindro, Q) {
+            return (vMuela * 60) / (Q * Math.PI * diametroCilindro);
+        }
+
+        function mostrarResultado(mensaje) {
+            document.getElementById("results").innerHTML = mensaje;
+        }
+
+        function modificarValor(id, cambio) {
+            const input = document.getElementById(id);
+            let nuevoValor = parseFloat(input.value) + cambio;
+
+            // Rango para la muela: 550 mm a 915 mm
+            if (id === "diametroMuela") {
+                nuevoValor = Math.max(550, Math.min(915, nuevoValor));
+            }
+
+            if (nuevoValor > 0) {
+                input.value = nuevoValor;
+                calcularRPM();
+            }
+        }
+
+        window.onload = calcularRPM;
+    </script>
+
+</body>
+</html>
