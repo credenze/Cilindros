@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diámetro Real</title>
+    <title>Calculadora de Diámetro Real</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,23 +28,28 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
+        .input-group {
+            display: flex;
+            align-items: center;
             margin-bottom: 16px;
+        }
+        .input-group input[type="number"] {
+            flex: 1;
+            padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            text-align: center;
         }
-        button {
-            width: 100%;
-            padding: 10px;
+        .input-group button {
+            padding: 8px 12px;
             background-color: #28a745;
             color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-left: 8px;
         }
-        button:hover {
+        .input-group button:hover {
             background-color: #218838;
         }
         .result {
@@ -61,16 +66,28 @@
 <body>
 
 <div class="container">
-    <h1>Diámetro Real</h1>
+    <h1>Calculadora de Diámetro Real</h1>
     
     <label for="maxDesgaste">Máximo Desgaste (mm):</label>
-    <input type="number" id="maxDesgaste" placeholder="Ingrese el máximo desgaste">
+    <div class="input-group">
+        <input type="number" id="maxDesgaste" step="0.001" placeholder="Ingrese el máximo desgaste">
+        <button onclick="adjustValue('maxDesgaste', -0.001)">-</button>
+        <button onclick="adjustValue('maxDesgaste', 0.001)">+</button>
+    </div>
     
     <label for="desgasteCentro">Desgaste en el Centro (mm):</label>
-    <input type="number" id="desgasteCentro" placeholder="Ingrese el desgaste en el centro">
+    <div class="input-group">
+        <input type="number" id="desgasteCentro" step="0.001" placeholder="Ingrese el desgaste en el centro">
+        <button onclick="adjustValue('desgasteCentro', -0.001)">-</button>
+        <button onclick="adjustValue('desgasteCentro', 0.001)">+</button>
+    </div>
     
     <label for="diametroEntrada">Diámetro de Entrada (mm):</label>
-    <input type="number" id="diametroEntrada" placeholder="Ingrese el diámetro de entrada">
+    <div class="input-group">
+        <input type="number" id="diametroEntrada" step="0.001" placeholder="Ingrese el diámetro de entrada">
+        <button onclick="adjustValue('diametroEntrada', -0.001)">-</button>
+        <button onclick="adjustValue('diametroEntrada', 0.001)">+</button>
+    </div>
     
     <button onclick="calcularDiametroReal()">Calcular Diámetro Real</button>
     
@@ -78,6 +95,14 @@
 </div>
 
 <script>
+    function adjustValue(id, increment) {
+        const input = document.getElementById(id);
+        let value = parseFloat(input.value);
+        if (isNaN(value)) value = 0; // Si el campo está vacío, empezar desde 0
+        value += increment;
+        input.value = value.toFixed(3); // Redondear a 3 decimales
+    }
+
     function calcularDiametroReal() {
         // Obtener los valores de los campos de entrada
         const maxDesgaste = parseFloat(document.getElementById('maxDesgaste').value);
@@ -95,7 +120,7 @@
         const diametroReal = diametroEntrada - (diferenciaDesgaste * 2);
 
         // Mostrar el resultado
-        document.getElementById('resultado').innerText = `Diámetro Real: ${diametroReal.toFixed(2)} mm`;
+        document.getElementById('resultado').innerText = `Diámetro Real: ${diametroReal.toFixed(3)} mm`;
     }
 </script>
 
