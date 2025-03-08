@@ -84,9 +84,9 @@
     
     <label for="diametroEntrada">Diámetro de Entrada (mm):</label>
     <div class="input-group">
-        <input type="number" id="diametroEntrada" step="0.001" placeholder="Ingrese el diámetro de entrada">
-        <button onclick="adjustValue('diametroEntrada', -0.001)">-</button>
-        <button onclick="adjustValue('diametroEntrada', 0.001)">+</button>
+        <input type="number" id="diametroEntrada" step="0.1" placeholder="Ingrese el diámetro de entrada">
+        <button onclick="adjustValue('diametroEntrada', -0.01)">-</button>
+        <button onclick="adjustValue('diametroEntrada', 0.01)">+</button>
     </div>
     
     <button onclick="calcularDiametroReal()">Calcular Diámetro Real</button>
