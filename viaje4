@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Viaje en Autocaravana – Agosto</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; color: #333; line-height: 1.6; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    h1, h2 { color: #005580; }
+    img { width: 100%; border-radius: 5px; margin: 10px 0; }
+    .section { margin-bottom: 30px; }
+    .subtitle { font-weight: bold; margin-top: 10px; }
+    .footer { font-size: 0.9em; color: #888; text-align: center; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Viaje en Autocaravana<br><small>5–22 de agosto</small></h1>
+
+    <div class="section">
+      <h2>Día 1–2: Proaza → Lugo → Narón</h2>
+      <p><span class="subtitle">Ruta inicial:</span> Parada en Lugo para visitar su muralla romana y comer en restaurantes dog-friendly.</p>
+      <p><span class="subtitle">Destino:</span> Llegada a Narón y descanso en área de autocaravanas.</p>
+      <p><span class="subtitle">Recomendación:</span> Restaurante “A Nosa Terra” y paseo marítimo de Lugo con perros.</p>
+    </div>
+
+    <div class="section">
+      <h2>Días 3–6: Festival Gullivert (Narón)</h2>
+      <p><span class="subtitle">Ambiente:</span> Festival familiar con talleres, conciertos y actividades al aire libre.</p>
+      <p><span class="subtitle">Curiosidad:</span> Se celebra cada verano y es ideal para niños de todas las edades.</p>
+      <img src="https://images.pexels.com/photos/29628354/pexels-photo-29628354.jpeg" alt="Festival Gullivert">
+    </div>
+
+    <div class="section">
+      <h2>Días 7–10: O Grove</h2>
+      <p><span class="subtitle">Alojamiento:</span> Área Campolongo, cerca del mar y del centro.</p>
+      <p><span class="subtitle">Actividades:</span> Kayak, excursiones en barco, playas amplias.</p>
+      <p><span class="subtitle">Curiosidad:</span> O Grove celebra la Fiesta del Marisco en octubre.</p>
+      <img src="https://images.pexels.com/photos/31858381/pexels-photo-31858381.jpeg" alt="O Grove">
+    </div>
+
+    <div class="section">
+      <h2>Días 11–13: Oporto y Gaia</h2>
+      <p><span class="subtitle">Qué ver:</span> Livraria Lello, Puente Luis I, SEA Life y Parque da Cidade.</p>
+      <p><span class="subtitle">Recomendación:</span> Crucero de los seis puentes.</p>
+      <p><span class="subtitle">Curiosidad:</span> J.K. Rowling vivió en Oporto, inspiración para Harry Potter.</p>
+      <img src="https://images.pexels.com/photos/17461809/pexels-photo-17461809.jpeg" alt="Oporto">
+    </div>
+
+    <div class="section">
+      <h2>Días 14–16: Nazaré</h2>
+      <p><span class="subtitle">Atracciones:</span> El funicular al Sítio y las playas doradas.</p>
+      <p><span class="subtitle">Recomendación:</span> Mercado municipal y marisco local.</p>
+      <p><span class="subtitle">Curiosidad:</span> Las olas de Nazaré son famosas entre surfistas de todo el mundo.</p>
+      <img src="https://images.pexels.com/photos/29346910/pexels-photo-29346910.jpeg" alt="Nazaré">
+    </div>
+
+    <div class="section">
+      <h2>Días 17–19: Coímbra / Serra da Estrela / Zamora</h2>
+      <p><span class="subtitle">Coímbra:</span> Universidad histórica y vistas al río Mondego.</p>
+      <p><span class="subtitle">Serra da Estrela:</span> Ruta por paisajes montañosos y pueblos tradicionales.</p>
+      <p><span class="subtitle">Zamora:</span> Casco antiguo y gastronomía junto al Duero.</p>
+      <p><span class="subtitle">Curiosidad:</span> Zamora posee la mayor concentración de iglesias románicas de Europa.</p>
+      <img src="https://images.pexels.com/photos/10255612/pexels-photo-10255612.jpeg" alt="Zamora">
+    </div>
+
+    <div class="section">
+      <h2>Conclusión</h2>
+      <p>Un viaje inolvidable en familia, lleno de descubrimientos, naturaleza y cultura. ¡Gracias a todos los que lo hicieron posible!</p>
+    </div>
+
+    <div class="footer">
+      Presentación generada por IA · Puedes responder este correo para compartir recuerdos o añadir fotos
+    </div>
+  </div>
+</body>
+</html>
