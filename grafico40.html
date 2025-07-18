@@ -1,75 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPM del Cilindro (q=40)</title>
-    <!-- Incluir Plotly desde un CDN -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Calculadora X</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 400px; margin: auto; background: #f4f4f4; }
+    label, select, input, button { display: block; margin: 10px 0; width: 100%; }
+    button { padding: 10px; background: #27ae60; color: white; border: none; cursor: pointer; }
+    button:hover { background: #1e8449; }
+    #resultado { font-weight: bold; margin-top: 20px; }
+  </style>
 </head>
 <body>
-    <div id="heatmap" style="width: 900px; height: 600px;"></div>
-    <br>
-    <button id="download-button">Descargar Gráfico como Imagen</button>
+  <h2>Calculadora valor X</h2>
 
-    <script>
-        // Parámetros
-        const D_m_values = Array.from({ length: 38 }, (_, i) => 550 + i * 10); // Diámetro de la muela (550 - 920 mm)
-        const D_p_values = Array.from({ length: 18 }, (_, i) => 619 + i * 5);  // Diámetro del cilindro (619 - 705 mm)
-        const N_m = 1000; // RPM de la muela fija
-        const q = 40;     // Relación de velocidad
+  <label for="maquina">Selecciona la máquina:</label>
+  <select id="maquina">
+    <option value="rc1">RC1</option>
+    <option value="rc3">RC3</option>
+    <option value="rc4">RC4</option>
+  </select>
 
-        // Calcular la matriz de RPM del cilindro
-        const rpm_cilindro = D_p_values.map(D_p =>
-            D_m_values.map(D_m => (N_m * D_m) / (q * D_p))
-        );
+  <label for="diametroMuela">Diámetro de la muela (mm):</label>
+  <input type="number" id="diametroMuela" placeholder="Ej. 900" />
 
-        // Crear el heatmap con Plotly
-        const data = {
-            z: rpm_cilindro,
-            x: D_m_values,
-            y: D_p_values,
-            type: 'heatmap',
-            colorscale: 'Portland', // Esquema de colores similar a "coolwarm"
-            colorbar: {
-                title: 'RPM del Cilindro'
-            }
-        };
+  <label for="diametroCilindro">Diámetro del cilindro (mm):</label>
+  <input type="number" id="diametroCilindro" placeholder="Ej. 640" />
 
-        const layout = {
-            title: 'RPM del Cilindro necesarias para cumplir q=40',
-            xaxis: {
-                title: 'Diámetro de la Muela (mm)',
-                tickvals: D_m_values.filter((_, i) => i % 5 === 0), // Mostrar cada 5 valores
-                ticktext: D_m_values.filter((_, i) => i % 5 === 0).map(String)
-            },
-            yaxis: {
-                title: 'Diámetro del Cilindro (mm)',
-                tickvals: D_p_values.filter((_, i) => i % 2 === 0), // Mostrar cada 2 valores
-                ticktext: D_p_values.filter((_, i) => i % 2 === 0).map(String)
-            },
-            width: 900,
-            height: 600
-        };
+  <button onclick="calcularX()">Calcular X</button>
 
-        // Renderizar el gráfico
-        Plotly.newPlot('heatmap', [data], layout);
+  <div id="resultado"></div>
 
-        // Función para descargar el gráfico como imagen
-        document.getElementById('download-button').addEventListener('click', function () {
-            Plotly.toImage(document.getElementById('heatmap'), {
-                format: 'png', // Formato de la imagen
-                width: 900,    // Ancho de la imagen
-                height: 600,   // Alto de la imagen
-                scale: 2       // Escala de la imagen (2x para mayor resolución)
-            }).then(function (url) {
-                // Crear un enlace temporal para descargar la imagen
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'rpm_cilindro_heatmap_q40.png'; // Nombre del archivo
-                link.click(); // Simular clic en el enlace
-            });
-        });
-    </script>
+  <script>
+    function calcularX() {
+      const maquina = document.getElementById("maquina").value;
+      const diametroMuela = parseFloat(document.getElementById("diametroMuela").value);
+      const diametroCilindro = parseFloat(document.getElementById("diametroCilindro").value);
+
+      if (isNaN(diametroMuela) || isNaN(diametroCilindro) || diametroMuela <= 0 || diametroCilindro <= 0) {
+        document.getElementById("resultado").innerText = "Introduce valores válidos.";
+        return;
+      }
+
+      const radioMuela = diametroMuela / 2;
+      const radioCilindro = diametroCilindro / 2;
+
+      let constante = 0;
+
+      switch(maquina) {
+        case "rc1":
+          constante = 979;
+          break;
+        case "rc3":
+          constante = 1322.5;
+          break;
+        case "rc4":
+          constante = 1317;
+          break;
+      }
+
+      const x = constante - (radioMuela + radioCilindro);
+
+      document.getElementById("resultado").innerText = 
+        `Valor de X: ${x.toFixed(2)} mm`;
+    }
+  </script>
 </body>
 </html>
