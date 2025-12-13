@@ -2,31 +2,73 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Calculadora carga coche eléctrico</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carga EV</title>
+
 <style>
     body {
-        font-family: Arial, sans-serif;
-        max-width: 420px;
-        margin: auto;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+        background: #f2f2f7;
+        margin: 0;
+        padding: 16px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 16px;
         padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+
+    h1 {
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
     label {
+        font-size: 14px;
+        font-weight: 600;
         display: block;
-        margin-top: 12px;
+        margin-top: 16px;
     }
+
     input {
         width: 100%;
-        padding: 6px;
-        margin-top: 4px;
+        font-size: 18px;
+        padding: 12px;
+        margin-top: 6px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
     }
+
     button {
-        margin-top: 16px;
-        padding: 10px;
+        margin-top: 24px;
         width: 100%;
-        font-size: 16px;
+        padding: 14px;
+        font-size: 18px;
+        font-weight: bold;
+        background: #007aff;
+        color: white;
+        border: none;
+        border-radius: 14px;
     }
+
+    button:active {
+        background: #005fd1;
+    }
+
     .resultado {
-        margin-top: 20px;
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #eef1f6;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .dato {
+        font-size: 20px;
         font-weight: bold;
     }
 </style>
@@ -34,66 +76,66 @@
 
 <body>
 
-<h2>Calculadora de tiempo de carga EV</h2>
+<div class="card">
 
-<label>
-Porcentaje actual de batería (%):
-<input type="number" id="actual" min="0" max="100" value="70">
-</label>
+<h1>🔋 Calculadora carga EV</h1>
 
-<label>
-Porcentaje deseado (%):
-<input type="number" id="objetivo" min="0" max="100" value="85">
-</label>
+<label>Batería actual (%)</label>
+<input type="number" id="actual" value="70" min="0" max="100">
 
-<label>
-Amperaje de carga (A):
-<input type="number" id="amperios" min="1" max="32" value="8">
-</label>
+<label>Batería objetivo (%)</label>
+<input type="number" id="objetivo" value="85" min="0" max="100">
 
-<button onclick="calcular()">Calcular hora de finalización</button>
+<label>Amperaje de carga (A)</label>
+<input type="number" id="amperios" value="8" min="1" max="32">
+
+<button onclick="calcular()">Calcular</button>
 
 <div class="resultado" id="resultado"></div>
 
+</div>
+
 <script>
 function calcular() {
-    const bateriaKWh = 44;
+    const bateria = 44;
     const voltaje = 230;
 
-    const actual = parseFloat(document.getElementById("actual").value);
-    const objetivo = parseFloat(document.getElementById("objetivo").value);
-    const amperios = parseFloat(document.getElementById("amperios").value);
+    const actual = Number(document.getElementById("actual").value);
+    const objetivo = Number(document.getElementById("objetivo").value);
+    const amperios = Number(document.getElementById("amperios").value);
 
     if (objetivo <= actual) {
         document.getElementById("resultado").innerText =
-            "El porcentaje deseado debe ser mayor que el actual.";
+            "⚠️ El porcentaje objetivo debe ser mayor que el actual.";
         return;
     }
 
-    const potenciaKW = (voltaje * amperios) / 1000;
+    const potencia = (voltaje * amperios) / 1000;
 
-    let energiaTotal = 0;
-
+    let energia = 0;
     for (let p = actual; p < objetivo; p++) {
         let factor = 1;
-
         if (p >= 80 && p < 85) factor = 0.85;
         if (p >= 85) factor = 0.70;
-
-        energiaTotal += (bateriaKWh / 100) / factor;
+        energia += (bateria / 100) / factor;
     }
 
-    const horas = energiaTotal / potenciaKW;
+    const horas = energia / potencia;
 
     const ahora = new Date();
-    const fin = new Date(ahora.getTime() + horas * 60 * 60 * 1000);
+    const fin = new Date(ahora.getTime() + horas * 3600000);
 
-    const opciones = { hour: '2-digit', minute: '2-digit' };
-    const horaFin = fin.toLocaleTimeString('es-ES', opciones);
+    const horaFin = fin.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 
-    document.getElementById("resultado").innerText =
-        `⏱ Tiempo estimado: ${horas.toFixed(2)} h
-🕒 Hora aproximada de finalización: ${horaFin}`;
+    document.getElementById("resultado").innerHTML = `
+        ⏱ Tiempo estimado:<br>
+        <span class="dato">${horas.toFixed(2)} h</span><br><br>
+        🕒 Hora aproximada de fin:<br>
+        <span class="dato">${horaFin}</span>
+    `;
 }
 </script>
 
