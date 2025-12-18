@@ -164,13 +164,6 @@ function mostrar() {
     historial.innerHTML = html || "Sin registros";
 }
 
-function borrar() {
-    if (confirm("¿Borrar todas las cargas?")) {
-        localStorage.removeItem("cargas");
-        mostrar();
-    }
-}
-
 mostrar();
 </script>
 
