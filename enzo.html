@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Tarjeta Regalo Game Pass - Enzo</title>
+    <style>
+        @page { size: A4 portrait; margin: 0mm; }
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; font-weight: bold; }
+        .page { 
+            width: 210mm; 
+            height: 297mm; 
+            display: flex; 
+            page-break-after: always; 
+            position: relative;
+        }
+        .page:last-of-type { page-break-after: avoid; }
+        .panel { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 25mm 15mm; 
+            box-sizing: border-box; 
+        }
+        .front { 
+            background: linear-gradient(135deg, #0078d4, #106ebe); 
+            color: white; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .back { 
+            background: linear-gradient(135deg, #f3f2f1, #edebe9); 
+            color: #323130; 
+        }
+        .inside-left { 
+            background: linear-gradient(135deg, #107c10, #117a00); 
+            color: white; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .inside-right { 
+            background: white; 
+            color: #323130; 
+        }
+        .title { font-size: 32pt; margin: 0 0 15px 0; text-align: center; }
+        .subtitle { font-size: 20pt; margin: 10px 0; text-align: center; }
+        .big-code { 
+            font-family: 'Courier New', monospace; 
+            font-size: 28pt; 
+            font-weight: bold; 
+            letter-spacing: 4px; 
+            text-align: center; 
+            background: rgba(255,255,255,0.9); 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 3px solid #0078d4; 
+            margin: 20px 0; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .mensaje { font-size: 16pt; text-align: center; margin: 10px 0; }
+        .instr { font-size: 14pt; text-align: center; line-height: 1.4; }
+        .fold { 
+            position: absolute; 
+            left: 105mm; 
+            top: 0; 
+            width: 0.5mm; 
+            height: 297mm; 
+            background: repeating-linear-gradient(to bottom, transparent 0 4mm, #ccc 4mm 5mm); 
+        }
+        @media print { 
+            .fold { background: repeating-linear-gradient(to bottom, transparent 0 2mm, #999 2mm 3mm); } 
+        }
+        @media screen { .page { border: 2px dashed #ccc; margin: 10px; } }
+    </style>
+</head>
+<body>
+    <!-- PÁGINA 1: EXTERIOR (imprime primero) -->
+    <div class="page">
+        <div class="panel back">
+            <div class="title">¡Para Enzo! 🎮</div>
+            <div class="mensaje">De: [Pon tu nombre aquí]</div>
+            <p style="font-size: 18pt; text-align: center; margin-top: 30px;">Una sorpresa épica te espera...</p>
+        </div>
+        <div class="panel front">
+            <div class="title">GAME PASS</div>
+            <div class="subtitle">PC • 3 MESES</div>
+            <div style="font-size: 24pt; margin: 20px 0;">¡Miles de juegos!</div>
+        </div>
+        <div class="fold"></div>
+    </div>
+    
+    <!-- PÁGINA 2: INTERIOR (imprime en el reverso) -->
+    <div class="page">
+        <div class="panel inside-left">
+            <div class="title">¡A JUGAR! 🚀</div>
+            <div class="mensaje">Disfruta de cientos de juegos en PC cuando quieras.</div>
+            <p style="font-size: 18pt; text-align: center; margin-top: 20px;">¡Pura diversión!</p>
+        </div>
+        <div class="panel inside-right">
+            <div class="title">CÓDIGO DE CANJE</div>
+            <div class="big-code">JRQMK-7HX6J-76TRK-T2KQF-M64PZ</div>
+            <div class="instr">
+                1. Ve a <strong>xbox.com/redeem</strong><br>
+                2. Inicia sesión en tu cuenta Microsoft<br>
+                3. Introduce el código<br>
+                <strong>¡Activado en segundos!</strong>
+            </div>
+        </div>
+        <div class="fold"></div>
+    </div>
+</body>
+</html>
