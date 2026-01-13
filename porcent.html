@@ -53,10 +53,6 @@
         border-radius: 10px;
     }
 
-    button:active {
-        background: #005fcc;
-    }
-
     table {
         width: 100%;
         border-collapse: collapse;
@@ -103,18 +99,20 @@ function calcular() {
     const CAPACIDAD = 44;      // kWh
     const VOLTAJE = 230;
     const AMPERS = [6, 8, 10, 12];
+    const HORAS = 8;
 
     const porcentajeInicial = Number(document.getElementById("porcentaje").value);
-
     if (isNaN(porcentajeInicial) || porcentajeInicial < 0 || porcentajeInicial > 100) {
         alert("Introduce un porcentaje válido");
         return;
     }
 
+    const ahora = new Date();
+
     let html = `
         <table>
             <tr>
-                <th>Horas</th>
+                <th>Hora</th>
                 <th>6 A</th>
                 <th>8 A</th>
                 <th>10 A</th>
@@ -122,22 +120,33 @@ function calcular() {
             </tr>
     `;
 
-    for (let h = 0; h <= 6; h++) {
-        html += `<tr><td>${h}</td>`;
+    for (let h = 0; h <= HORAS; h++) {
+        const hora = new Date(ahora);
+        hora.setHours(hora.getHours() + h);
+
+        const horaTxt = hora.toLocaleTimeString("es-ES", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+        html += `<tr><td>${horaTxt}</td>`;
 
         AMPERS.forEach(a => {
             const potencia = (VOLTAJE * a) / 1000; // kW
-            const energia = (CAPACIDAD * porcentajeInicial / 100) + potencia * h;
-            const porcentaje = Math.min((energia / CAPACIDAD) * 100, 100).toFixed(1);
+            const energiaInicial = CAPACIDAD * porcentajeInicial / 100;
+            const energiaTotal = energiaInicial + potencia * h;
+            const porcentaje = Math.min((energiaTotal / CAPACIDAD) * 100, 100).toFixed(1);
             html += `<td>${porcentaje}%</td>`;
         });
 
         html += `</tr>`;
     }
 
-    html += `</table>
+    html += `
+        </table>
         <div class="note">
-            Cálculo aproximado · 230 V · sin pérdidas
+            Hora inicial: ${ahora.toLocaleTimeString("es-ES", {hour:'2-digit', minute:'2-digit'})}
+            · Cálculo aproximado a 230 V
         </div>
     `;
 
