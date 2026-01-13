@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Carga C3 Eléctrico - Con Tooltip</title>
+<title>Carga C3 Eléctrico - PWA</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,7 +49,7 @@ button:active { background:#005fcc; }
 
 canvas {
     width:100%;
-    height:300px;
+    height:320px;
     margin-top:20px;
     border:1px solid #ddd;
     border-radius:12px;
@@ -68,9 +68,19 @@ canvas {
     font-size:12px;
     display:none;
     z-index:100;
+    max-width: 120px;
+    word-wrap: break-word;
 }
-table { width:100%; border-collapse:collapse; margin-top:20px; text-align:center;}
-th, td { border:1px solid #ddd; padding:8px;}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    text-align:center;
+    table-layout: fixed;
+}
+
+th, td { border:1px solid #ddd; padding:8px; font-size:14px;}
 th { background:#eee;}
 </style>
 </head>
@@ -119,14 +129,14 @@ function calcular() {
     // Ejes
     ctx.strokeStyle="#aaa"; ctx.lineWidth=1;
     ctx.beginPath();
-    ctx.moveTo(50,10); ctx.lineTo(50,canvas.height-40);
-    ctx.lineTo(canvas.width-10,canvas.height-40);
+    ctx.moveTo(50,10); ctx.lineTo(50,canvas.height-60);
+    ctx.lineTo(canvas.width-10,canvas.height-60);
     ctx.stroke();
 
     // Líneas guía y % Y
     ctx.fillStyle="#555"; ctx.font="12px sans-serif";
     for(let i=0;i<=5;i++){
-        const y = canvas.height-40 - i*(canvas.height-40)/5;
+        const y = canvas.height-60 - i*(canvas.height-50)/5;
         ctx.fillText((i*20)+"%",0,y+5);
         ctx.beginPath();
         ctx.moveTo(50,y); ctx.lineTo(canvas.width-10,y);
@@ -134,7 +144,16 @@ function calcular() {
         ctx.stroke();
     }
 
-    // Guardamos coordenadas de puntos para tooltip
+    // Dibujar horas fijas en X
+    ctx.fillStyle="#555";
+    ctx.font="10px sans-serif";
+    for(let h=0;h<=HORAS_MAX;h++){
+        const horaActual = new Date(ahora); horaActual.setHours(horaActual.getHours()+h);
+        const x = 50 + h*(canvas.width-60)/HORAS_MAX;
+        ctx.fillText(horaActual.getHours().toString().padStart(2,'0')+":00",x-12,canvas.height-45);
+    }
+
+    // Guardar puntos para tooltip
     const puntos = [];
 
     for(let a of amperios){
@@ -143,37 +162,41 @@ function calcular() {
         for(let h=0;h<=HORAS_MAX;h++){
             const horaActual = new Date(ahora); horaActual.setHours(horaActual.getHours()+h);
             const x = 50 + h*(canvas.width-60)/HORAS_MAX;
-            const y = canvas.height-40 - Math.min(porcentaje+h*SUBIDA[a],100)*(canvas.height-40)/100;
+            const y = canvas.height-60 - Math.min(porcentaje+h*SUBIDA[a],100)*(canvas.height-50)/100;
 
             if(h===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
 
-            // Guardar punto
             puntos.push({x,y,hora:horaActual.getHours().toString().padStart(2,'0')+":00", valor:Math.min(porcentaje+h*SUBIDA[a],100).toFixed(1), amper:a});
         }
-
         ctx.stroke();
 
         // Puntos visibles
         for(let h=0;h<=HORAS_MAX;h++){
             const p = puntos.find(pt=>pt.amper===a && pt.hora===new Date(ahora).setHours(new Date(ahora).getHours()+h));
             const x = 50 + h*(canvas.width-60)/HORAS_MAX;
-            const y = canvas.height-40 - Math.min(porcentaje+h*SUBIDA[a],100)*(canvas.height-40)/100;
-            ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI); ctx.fillStyle=colores[a]; ctx.fill();
+            const y = canvas.height-60 - Math.min(porcentaje+h*SUBIDA[a],100)*(canvas.height-50)/100;
+            ctx.beginPath(); ctx.arc(x,y,5,0,2*Math.PI); ctx.fillStyle=colores[a]; ctx.fill();
+            ctx.strokeStyle="#fff"; ctx.lineWidth=1; ctx.stroke();
         }
     }
 
-    // Tooltip
+    // Tooltip táctil y mouse
     const tooltip = document.getElementById("tooltip");
-    canvas.onmousemove = function(e){
-        const rect = canvas.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-        let show=false;
 
+    function showTooltip(e) {
+        const rect = canvas.getBoundingClientRect();
+        let mx, my;
+        if(e.touches) { mx=e.touches[0].clientX-rect.left; my=e.touches[0].clientY-rect.top; }
+        else { mx=e.offsetX; my=e.offsetY; }
+
+        let show=false;
         for(let p of puntos){
-            if(Math.hypot(mx-p.x,my-p.y)<6){
-                tooltip.style.left=(p.x+rect.left+10)+"px";
-                tooltip.style.top=(p.y+rect.top-25)+"px";
+            if(Math.hypot(mx-p.x,my-p.y)<8){
+                let left = p.x+rect.left+10;
+                let top = p.y+rect.top-35;
+                if(top<10) top=10;
+                tooltip.style.left=left+"px";
+                tooltip.style.top=top+"px";
                 tooltip.innerHTML=`${p.amper} A: ${p.valor}% a las ${p.hora}`;
                 tooltip.style.display="block";
                 show=true;
@@ -183,6 +206,11 @@ function calcular() {
         if(!show) tooltip.style.display="none";
     }
 
+    canvas.onmousemove=showTooltip;
+    canvas.ontouchstart=showTooltip;
+    canvas.ontouchmove=showTooltip;
+    canvas.ontouchend=()=>tooltip.style.display="none";
+
     // Hora aprox 100% amperaje máximo
     const maxA = Math.max(...amperios);
     const horasPara100 = Math.ceil((100-porcentaje)/SUBIDA[maxA]);
@@ -190,13 +218,13 @@ function calcular() {
     horaFin.setHours(horaFin.getHours() + horasPara100);
     document.getElementById("horaFin").textContent = `Hora aprox. 100% (${maxA} A): ${horaFin.toLocaleTimeString("es-ES",{hour:'2-digit',minute:'2-digit'})}`;
 
-    // Tabla debajo
-    let tablaHTML=`<table><tr><th>Hora</th>${amperios.map(a=>a+"A").join("")}</tr>`;
+    // Tabla con table-layout fixed
+    let tablaHTML=`<table><tr><th>Hora</th>${amperios.map(a=>"<th>"+a+"A</th>").join("")}</tr>`;
     for(let h=0;h<=HORAS_MAX;h++){
         const horaActual = new Date(ahora); horaActual.setHours(horaActual.getHours()+h);
         tablaHTML+="<tr><td>"+horaActual.getHours().toString().padStart(2,'0')+":00</td>";
         for(let a of amperios){
-            tablaHTML+="<td>"+Math.min(porcentaje+h*SUBIDA[a],100)+"%</td>";
+            tablaHTML+="<td>"+Math.min(porcentaje+h*SUBIDA[a],100).toFixed(1)+"%</td>";
         }
         tablaHTML+="</tr>";
     }
