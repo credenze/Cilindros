@@ -1,100 +1,147 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Calculadora carga Citroën C3 </title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: auto;
-        }
-        input {
-            margin: 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora carga Citroën C3</title>
+
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        padding: 16px;
+        background: #f4f4f4;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .card {
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    label {
+        display: block;
+        margin-top: 12px;
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 10px;
+        margin-top: 6px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        margin-top: 16px;
+        width: 100%;
+        padding: 14px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        background: #007aff;
+        color: white;
+        border: none;
+        border-radius: 10px;
+    }
+
+    button:active {
+        background: #005fcc;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+        font-size: 0.95rem;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    th {
+        background: #eee;
+    }
+
+    .note {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: #555;
+        text-align: center;
+    }
+</style>
 </head>
+
 <body>
 
-<h2>Calculadora de carga – Citroën C3 Eléctrico (44 kWh)</h2>
+<h1>Carga Citroën C3 Eléctrico</h1>
 
-<p>Hora actual: <strong id="horaActual"></strong></p>
+<div class="card">
 
-<label>
-    Porcentaje actual de batería:
-    <input type="number" id="porcentajeActual" value="30" min="0" max="100">
-</label>
+    <label>Porcentaje inicial de batería (%)</label>
+    <input type="number" id="porcentaje" min="0" max="100" value="30">
 
-<br><br>
+    <button onclick="calcular()">Calcular</button>
 
-<button onclick="calcular()">Calcular</button>
+    <div id="resultado"></div>
 
-<br><br>
-
-<canvas id="grafica"></canvas>
+</div>
 
 <script>
-const CAPACIDAD_KWH = 44;
-const VOLTAJE = 230;
-const AMPERS = [6, 8, 10, 12]; // intensidades a calcular
-const COLORES = ['red', 'green', 'blue', 'orange'];
-
-document.getElementById("horaActual").textContent =
-    new Date().toLocaleTimeString("es-ES", { hour: '2-digit', minute: '2-digit' });
-
-let chart;
-
 function calcular() {
-    const porcentajeInicial = Number(document.getElementById("porcentajeActual").value);
-    if (porcentajeInicial < 0 || porcentajeInicial > 100) {
-        alert("Porcentaje no válido");
+    const CAPACIDAD = 44;      // kWh
+    const VOLTAJE = 230;
+    const AMPERS = [6, 8, 10, 12];
+
+    const porcentajeInicial = Number(document.getElementById("porcentaje").value);
+
+    if (isNaN(porcentajeInicial) || porcentajeInicial < 0 || porcentajeInicial > 100) {
+        alert("Introduce un porcentaje válido");
         return;
     }
 
-    const ahora = new Date();
-    const etiquetas = [];
-    for (let i = 0; i < 6; i++) { // 6 horas de proyección
-        let hora = new Date(ahora);
-        hora.setHours(hora.getHours() + i);
-        etiquetas.push(hora.toLocaleTimeString("es-ES", { hour: '2-digit', minute: '2-digit' }));
+    let html = `
+        <table>
+            <tr>
+                <th>Horas</th>
+                <th>6 A</th>
+                <th>8 A</th>
+                <th>10 A</th>
+                <th>12 A</th>
+            </tr>
+    `;
+
+    for (let h = 0; h <= 6; h++) {
+        html += `<tr><td>${h}</td>`;
+
+        AMPERS.forEach(a => {
+            const potencia = (VOLTAJE * a) / 1000; // kW
+            const energia = (CAPACIDAD * porcentajeInicial / 100) + potencia * h;
+            const porcentaje = Math.min((energia / CAPACIDAD) * 100, 100).toFixed(1);
+            html += `<td>${porcentaje}%</td>`;
+        });
+
+        html += `</tr>`;
     }
 
-    const datasets = AMPERS.map((a, i) => {
-        const potenciaKW = (VOLTAJE * a) / 1000;
-        const datos = [];
-        let energia = CAPACIDAD_KWH * (porcentajeInicial / 100);
+    html += `</table>
+        <div class="note">
+            Cálculo aproximado · 230 V · sin pérdidas
+        </div>
+    `;
 
-        for (let j = 0; j < etiquetas.length; j++) {
-            datos.push(Number(Math.min((energia / CAPACIDAD_KWH * 100), 100).toFixed(1)));
-            energia += potenciaKW; // cada hora
-        }
-
-        return {
-            label: a + ' A',
-            data: datos,
-            borderWidth: 2,
-            fill: false,
-            borderColor: COLORES[i],
-            backgroundColor: COLORES[i]
-        };
-    });
-
-    if (chart) chart.destroy();
-    const ctx = document.getElementById('grafica').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: etiquetas, datasets },
-        options: {
-            scales: {
-                y: { min: 0, max: 100, title: { display: true, text: '% batería' } },
-                x: { title: { display: true, text: 'Hora' } }
-            },
-            plugins: {
-                legend: { display: true }
-            }
-        }
-    });
+    document.getElementById("resultado").innerHTML = html;
 }
 </script>
 
