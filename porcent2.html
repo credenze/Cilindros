@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Carga C3 Eléctrico</title>
+<title>Carga C3 Eléctrico - Con Tooltip</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -56,6 +56,22 @@ canvas {
 }
 
 .note { font-size:0.85rem; color:#555; margin-top:10px; text-align:center; }
+
+/* Tooltip */
+#tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 6px 10px;
+    border-radius:6px;
+    pointer-events:none;
+    font-size:12px;
+    display:none;
+    z-index:100;
+}
+table { width:100%; border-collapse:collapse; margin-top:20px; text-align:center;}
+th, td { border:1px solid #ddd; padding:8px;}
+th { background:#eee;}
 </style>
 </head>
 
@@ -73,90 +89,120 @@ canvas {
     <button onclick="calcular()">Calcular evolución</button>
 
     <canvas id="grafica"></canvas>
-    <div class="note" id="horaFin"></div>
+    <div id="horaFin" class="note"></div>
+    <div id="tablaResultados"></div>
 </div>
 
+<div id="tooltip"></div>
+
 <script>
-const SUBIDA = {6:3, 10:5, 12:6, 16:8}; // %/hora
+const SUBIDA = {6:3, 10:5, 12:6, 16:8};
 const HORAS_MAX = 16;
+const colores = {6:"#007aff",10:"#00b300",12:"#ff6600",16:"#ff0000"};
 
 function calcular() {
     const porcentaje = Number(document.getElementById("porcentaje").value);
     const amperiosMax = Number(document.getElementById("amperiosMax").value);
-    if(isNaN(porcentaje) || porcentaje<0 || porcentaje>100) { alert("Introduce 0-100"); return; }
-    if(isNaN(amperiosMax) || amperiosMax<6 || amperiosMax>16) { alert("Amperios entre 6 y 16"); return; }
+    if(isNaN(porcentaje) || porcentaje<0 || porcentaje>100) { alert("0-100"); return; }
+    if(isNaN(amperiosMax) || amperiosMax<6 || amperiosMax>16) { alert("6-16 A"); return; }
 
+    const amperios = [6,10,12,16].filter(a=>a<=amperiosMax);
     const ahora = new Date();
+
     const canvas = document.getElementById("grafica");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d");
 
-    // Limpiar canvas
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // Ejes
-    ctx.strokeStyle="#aaa";
-    ctx.lineWidth=1;
+    ctx.strokeStyle="#aaa"; ctx.lineWidth=1;
     ctx.beginPath();
-    ctx.moveTo(50,10); ctx.lineTo(50,canvas.height-40); // Y
-    ctx.lineTo(canvas.width-10,canvas.height-40); // X
+    ctx.moveTo(50,10); ctx.lineTo(50,canvas.height-40);
+    ctx.lineTo(canvas.width-10,canvas.height-40);
     ctx.stroke();
 
-    // Dibujar porcentajes horizontales y líneas guía
-    ctx.fillStyle="#555";
-    ctx.font="12px sans-serif";
+    // Líneas guía y % Y
+    ctx.fillStyle="#555"; ctx.font="12px sans-serif";
     for(let i=0;i<=5;i++){
         const y = canvas.height-40 - i*(canvas.height-40)/5;
         ctx.fillText((i*20)+"%",0,y+5);
         ctx.beginPath();
-        ctx.moveTo(50,y);
-        ctx.lineTo(canvas.width-10,y);
+        ctx.moveTo(50,y); ctx.lineTo(canvas.width-10,y);
         ctx.strokeStyle="#eee";
         ctx.stroke();
     }
 
-    // Dibujar líneas para cada amperaje
-    const colores = {6:"#007aff",10:"#00b300",12:"#ff6600",16:"#ff0000"};
-    const amperios = [6,10,12,16].filter(a=>a<=amperiosMax);
+    // Guardamos coordenadas de puntos para tooltip
+    const puntos = [];
 
     for(let a of amperios){
-        ctx.beginPath();
-        ctx.strokeStyle = colores[a];
-        ctx.lineWidth=2;
+        ctx.beginPath(); ctx.strokeStyle = colores[a]; ctx.lineWidth=2;
 
-        for(let h=0; h<=HORAS_MAX; h++){
-            const horaActual = new Date(ahora);
-            horaActual.setHours(horaActual.getHours() + h);
-
+        for(let h=0;h<=HORAS_MAX;h++){
+            const horaActual = new Date(ahora); horaActual.setHours(horaActual.getHours()+h);
             const x = 50 + h*(canvas.width-60)/HORAS_MAX;
-            const y = canvas.height-40 - Math.min(porcentaje + h*SUBIDA[a],100)*(canvas.height-40)/100;
+            const y = canvas.height-40 - Math.min(porcentaje+h*SUBIDA[a],100)*(canvas.height-40)/100;
 
             if(h===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
 
-            // Dibujar etiqueta hora cada 2 horas
-            if(h%2===0){
-                ctx.fillStyle="#555";
-                ctx.font="10px sans-serif";
-                ctx.fillText(horaActual.getHours().toString().padStart(2,'0')+":00",x-10,canvas.height-25);
-            }
+            // Guardar punto
+            puntos.push({x,y,hora:horaActual.getHours().toString().padStart(2,'0')+":00", valor:Math.min(porcentaje+h*SUBIDA[a],100).toFixed(1), amper:a});
         }
+
         ctx.stroke();
 
-        // Etiqueta final con % y hora
-        const yEnd = canvas.height-40 - Math.min(porcentaje + HORAS_MAX*SUBIDA[a],100)*(canvas.height-40)/100;
-        ctx.fillStyle=colores[a];
-        ctx.fillText(a+"A",canvas.width-45,yEnd-5);
+        // Puntos visibles
+        for(let h=0;h<=HORAS_MAX;h++){
+            const p = puntos.find(pt=>pt.amper===a && pt.hora===new Date(ahora).setHours(new Date(ahora).getHours()+h));
+            const x = 50 + h*(canvas.width-60)/HORAS_MAX;
+            const y = canvas.height-40 - Math.min(porcentaje+h*SUBIDA[a],100)*(canvas.height-40)/100;
+            ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI); ctx.fillStyle=colores[a]; ctx.fill();
+        }
     }
 
-    // Hora aproximada 100% para el amperaje máximo
+    // Tooltip
+    const tooltip = document.getElementById("tooltip");
+    canvas.onmousemove = function(e){
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        let show=false;
+
+        for(let p of puntos){
+            if(Math.hypot(mx-p.x,my-p.y)<6){
+                tooltip.style.left=(p.x+rect.left+10)+"px";
+                tooltip.style.top=(p.y+rect.top-25)+"px";
+                tooltip.innerHTML=`${p.amper} A: ${p.valor}% a las ${p.hora}`;
+                tooltip.style.display="block";
+                show=true;
+                break;
+            }
+        }
+        if(!show) tooltip.style.display="none";
+    }
+
+    // Hora aprox 100% amperaje máximo
     const maxA = Math.max(...amperios);
     const horasPara100 = Math.ceil((100-porcentaje)/SUBIDA[maxA]);
     const horaFin = new Date(ahora);
     horaFin.setHours(horaFin.getHours() + horasPara100);
     document.getElementById("horaFin").textContent = `Hora aprox. 100% (${maxA} A): ${horaFin.toLocaleTimeString("es-ES",{hour:'2-digit',minute:'2-digit'})}`;
+
+    // Tabla debajo
+    let tablaHTML=`<table><tr><th>Hora</th>${amperios.map(a=>a+"A").join("")}</tr>`;
+    for(let h=0;h<=HORAS_MAX;h++){
+        const horaActual = new Date(ahora); horaActual.setHours(horaActual.getHours()+h);
+        tablaHTML+="<tr><td>"+horaActual.getHours().toString().padStart(2,'0')+":00</td>";
+        for(let a of amperios){
+            tablaHTML+="<td>"+Math.min(porcentaje+h*SUBIDA[a],100)+"%</td>";
+        }
+        tablaHTML+="</tr>";
+    }
+    tablaHTML+="</table>";
+    document.getElementById("tablaResultados").innerHTML = tablaHTML;
 }
 </script>
-
 </body>
 </html>
