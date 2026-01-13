@@ -77,7 +77,7 @@ canvas {
 </div>
 
 <script>
-const SUBIDA = {6:3, 10:5, 12:6, 16:8}; // %/hora por amperio
+const SUBIDA = {6:3, 10:5, 12:6, 16:8}; // %/hora
 const HORAS_MAX = 16;
 
 function calcular() {
@@ -99,40 +99,53 @@ function calcular() {
     ctx.strokeStyle="#aaa";
     ctx.lineWidth=1;
     ctx.beginPath();
-    ctx.moveTo(40,10); ctx.lineTo(40,canvas.height-30); // Y
-    ctx.lineTo(canvas.width-10,canvas.height-30); // X
+    ctx.moveTo(50,10); ctx.lineTo(50,canvas.height-40); // Y
+    ctx.lineTo(canvas.width-10,canvas.height-40); // X
     ctx.stroke();
 
-    // Dibujar porcentajes horizontales
+    // Dibujar porcentajes horizontales y líneas guía
     ctx.fillStyle="#555";
     ctx.font="12px sans-serif";
     for(let i=0;i<=5;i++){
-        const y = canvas.height-30 - i*(canvas.height-40)/5;
+        const y = canvas.height-40 - i*(canvas.height-40)/5;
         ctx.fillText((i*20)+"%",0,y+5);
         ctx.beginPath();
-        ctx.moveTo(40,y);
+        ctx.moveTo(50,y);
         ctx.lineTo(canvas.width-10,y);
         ctx.strokeStyle="#eee";
         ctx.stroke();
     }
 
-    // Dibujar líneas para cada amperaje disponible
+    // Dibujar líneas para cada amperaje
     const colores = {6:"#007aff",10:"#00b300",12:"#ff6600",16:"#ff0000"};
-
     const amperios = [6,10,12,16].filter(a=>a<=amperiosMax);
 
     for(let a of amperios){
         ctx.beginPath();
         ctx.strokeStyle = colores[a];
         ctx.lineWidth=2;
+
         for(let h=0; h<=HORAS_MAX; h++){
-            const x = 40 + h*(canvas.width-50)/HORAS_MAX;
-            const y = canvas.height-30 - Math.min(porcentaje + h*SUBIDA[a],100)*(canvas.height-40)/100;
+            const horaActual = new Date(ahora);
+            horaActual.setHours(horaActual.getHours() + h);
+
+            const x = 50 + h*(canvas.width-60)/HORAS_MAX;
+            const y = canvas.height-40 - Math.min(porcentaje + h*SUBIDA[a],100)*(canvas.height-40)/100;
+
             if(h===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+
+            // Dibujar etiqueta hora cada 2 horas
+            if(h%2===0){
+                ctx.fillStyle="#555";
+                ctx.font="10px sans-serif";
+                ctx.fillText(horaActual.getHours().toString().padStart(2,'0')+":00",x-10,canvas.height-25);
+            }
         }
         ctx.stroke();
-        // Etiqueta final
-        const yEnd = canvas.height-30 - Math.min(porcentaje + HORAS_MAX*SUBIDA[a],100)*(canvas.height-40)/100;
+
+        // Etiqueta final con % y hora
+        const yEnd = canvas.height-40 - Math.min(porcentaje + HORAS_MAX*SUBIDA[a],100)*(canvas.height-40)/100;
+        ctx.fillStyle=colores[a];
         ctx.fillText(a+"A",canvas.width-45,yEnd-5);
     }
 
