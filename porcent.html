@@ -97,9 +97,9 @@
 <script>
 function calcular() {
     const CAPACIDAD = 44;      // kWh
-    const VOLTAJE = 230;
-    const AMPERS = [6, 8, 10, 12];
-    const HORAS = 8;
+    const VOLTAJE = 228;
+    const AMPERS = [6, 8, 10, 12, 16];
+    const HORAS = 16;
 
     const porcentajeInicial = Number(document.getElementById("porcentaje").value);
     if (isNaN(porcentajeInicial) || porcentajeInicial < 0 || porcentajeInicial > 100) {
@@ -117,6 +117,7 @@ function calcular() {
                 <th>8 A</th>
                 <th>10 A</th>
                 <th>12 A</th>
+                <th>16 A</th>
             </tr>
     `;
 
