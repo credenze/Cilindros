@@ -2,216 +2,97 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Rectificado</title>
+    <title>Calculadora carga Citroën C3 Eléctrico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #ffebd3, #ffffff);
-            color: #333;
-        }
-        h2, h3 {
-            margin-bottom: 20px;
-            color: #ff6f00;
-        }
-        table {
-            width: 90%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 15px;
-            text-align: center;
-        }
-        th {
-            background-color: #ff6f00;
-            color: white;
+            max-width: 800px;
+            margin: auto;
         }
         input {
-            width: 100%;
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
             margin: 5px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .control-buttons button {
-            background-color: #ff6f00;
-            color: white;
-        }
-        .control-buttons button:hover {
-            background-color: #e65c00;
-        }
-        .calculate-button {
-            display: inline-block;
-            margin-top: 20px;
-        }
-        .calculate-button button {
-            background-color: #ff6f00;
-            color: white;
-            padding: 15px 30px;
-        }
-        .calculate-button button:hover {
-            background-color: #e65c00;
         }
     </style>
 </head>
 <body>
-    <h2>Calculadora de Parámetros de Rectificado</h2>
-    <table>
-        <tr>
-            <th>Parámetro</th>
-            <th>Configuración 1</th>
-            <th>Configuración 2</th>
-        </tr>
-        <tr>
-            <td>Diámetro de la muela (mm)</td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('diametroMuela1', -10, 550, 920)">-</button>
-                    <input type="number" id="diametroMuela1" value="750" oninput="calcular()">
-                    <button onclick="modificarValor('diametroMuela1', 10, 550, 920)">+</button>
-                </div>
-            </td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('diametroMuela2', -10, 550, 920)">-</button>
-                    <input type="number" id="diametroMuela2" value="750" oninput="calcular()">
-                    <button onclick="modificarValor('diametroMuela2', 10, 550, 920)">+</button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>RPM de la muela</td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('rpmMuela1', -100, 400, 1000)">-</button>
-                    <input type="number" id="rpmMuela1" value="800" oninput="calcular()">
-                    <button onclick="modificarValor('rpmMuela1', 100, 400, 1000)">+</button>
-                </div>
-            </td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('rpmMuela2', -100, 400, 1000)">-</button>
-                    <input type="number" id="rpmMuela2" value="800" oninput="calcular()">
-                    <button onclick="modificarValor('rpmMuela2', 100, 400, 1000)">+</button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>Diámetro de la pieza (mm)</td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('diametroPieza1', -10, 619, 705)">-</button>
-                    <input type="number" id="diametroPieza1" value="660" oninput="calcular()">
-                    <button onclick="modificarValor('diametroPieza1', 10, 619, 705)">+</button>
-                </div>
-            </td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('diametroPieza2', -10, 619, 705)">-</button>
-                    <input type="number" id="diametroPieza2" value="660" oninput="calcular()">
-                    <button onclick="modificarValor('diametroPieza2', 10, 619, 705)">+</button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>RPM de la pieza</td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('rpmPieza1', -1, 5, 60)">-</button>
-                    <input type="number" id="rpmPieza1" value="30" oninput="calcular()">
-                    <button onclick="modificarValor('rpmPieza1', 1, 5, 60)">+</button>
-                </div>
-            </td>
-            <td>
-                <div class="control-buttons">
-                    <button onclick="modificarValor('rpmPieza2', -1, 5, 60)">-</button>
-                    <input type="number" id="rpmPieza2" value="30" oninput="calcular()">
-                    <button onclick="modificarValor('rpmPieza2', 1, 5, 60)">+</button>
-                </div>
-            </td>
-        </tr>
-    </table>
 
-    <h3>Resultados</h3>
-    <table>
-        <tr>
-            <th>Parámetro</th>
-            <th>Configuración 1</th>
-            <th>Configuración 2</th>
-        </tr>
-        <tr>
-            <td>Velocidad de corte (m/s)</td>
-            <td id="vc1"></td>
-            <td id="vc2"></td>
-        </tr>
-        <tr>
-            <td>Velocidad de la pieza (m/s)</td>
-            <td id="vp1"></td>
-            <td id="vp2"></td>
-        </tr>
-        <tr>
-            <td>Relación de velocidad (q)</td>
-            <td id="q1"></td>
-            <td id="q2"></td>
-        </tr>
-    </table>
+<h2>Calculadora de carga – Citroën C3 Eléctrico (44 kWh)</h2>
 
-    <script>
-        function calcular() {
-            function velocidadCorte(diametro, rpm) {
-                return (Math.PI * diametro * rpm) / (60 * 1000);
-            }
-            function velocidadPieza(diametro, rpm) {
-                return (Math.PI * diametro * rpm) / (60 * 1000);
-            }
-            function relacionVelocidad(vc, vp) {
-                return vc / vp;
-            }
-            function calcularValores(sufijo) {
-                let diametroMuela = parseFloat(document.getElementById("diametroMuela" + sufijo).value);
-                let rpmMuela = parseFloat(document.getElementById("rpmMuela" + sufijo).value);
-                let diametroPieza = parseFloat(document.getElementById("diametroPieza" + sufijo).value);
-                let rpmPieza = parseFloat(document.getElementById("rpmPieza" + sufijo).value);
-                let vc = velocidadCorte(diametroMuela, rpmMuela);
-                let vp = velocidadPieza(diametroPieza, rpmPieza);
-                let q = relacionVelocidad(vc, vp);
-                document.getElementById("vc" + sufijo).innerText = vc.toFixed(2);
-                document.getElementById("vp" + sufijo).innerText = vp.toFixed(2);
-                document.getElementById("q" + sufijo).innerText = q.toFixed(2);
-            }
-            calcularValores(1);
-            calcularValores(2);
+<p>Hora actual: <strong id="horaActual"></strong></p>
+
+<label>
+    Porcentaje actual de batería:
+    <input type="number" id="porcentajeActual" value="30" min="0" max="100">
+</label>
+
+<br><br>
+
+<button onclick="calcular()">Calcular</button>
+
+<br><br>
+
+<canvas id="grafica"></canvas>
+
+<script>
+const CAPACIDAD_KWH = 44;
+const VOLTAJE = 230;
+const AMPERS = [6, 8, 10, 12]; // intensidades a calcular
+
+document.getElementById("horaActual").textContent =
+    new Date().toLocaleTimeString("es-ES", { hour: '2-digit', minute: '2-digit' });
+
+let chart;
+
+function calcular() {
+    const porcentajeInicial = Number(document.getElementById("porcentajeActual").value);
+    if (porcentajeInicial < 0 || porcentajeInicial > 100) {
+        alert("Porcentaje no válido");
+        return;
+    }
+
+    const ahora = new Date();
+    const etiquetas = [];
+    for (let i = 0; i < 6; i++) { // 6 horas de proyección
+        let hora = new Date(ahora);
+        hora.setHours(hora.getHours() + i);
+        etiquetas.push(hora.toLocaleTimeString("es-ES", { hour: '2-digit', minute: '2-digit' }));
+    }
+
+    const datasets = AMPERS.map(a => {
+        const potenciaKW = (VOLTAJE * a) / 1000;
+        const datos = [];
+        let energia = CAPACIDAD_KWH * (porcentajeInicial / 100);
+
+        for (let i = 0; i < etiquetas.length; i++) {
+            datos.push(Math.min((energia / CAPACIDAD_KWH * 100), 100).toFixed(1));
+            energia += potenciaKW; // cada hora
         }
 
-        function modificarValor(id, valor, min, max) {
-            let input = document.getElementById(id);
-            let nuevoValor = parseFloat(input.value) + valor;
-            nuevoValor = Math.max(min, Math.min(max, nuevoValor));
-            input.value = nuevoValor;
-            calcular(); // Actualizar resultados automáticamente
-        }
+        return {
+            label: a + ' A',
+            data: datos,
+            borderWidth: 2,
+            fill: false
+        };
+    });
 
-        // Calcular al cargar la página
-        calcular();
-    </script>
+    if (chart) chart.destroy();
+    const ctx = document.getElementById('grafica').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: etiquetas, datasets },
+        options: {
+            scales: {
+                y: { min: 0, max: 100, title: { display: true, text: '% batería' } },
+                x: { title: { display: true, text: 'Hora' } }
+            }
+        }
+    });
+}
+</script>
+
 </body>
 </html>
+     
+           
