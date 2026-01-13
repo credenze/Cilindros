@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carga C3 Eléctrico</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Carga C3">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin:0;
+    padding:20px;
+    background:#f4f4f8;
+}
+
+h2 { text-align:center; margin-bottom:16px; }
+
+.card {
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom:20px;
+}
+
+input, button {
+    width:100%;
+    font-size:18px;
+    padding:10px;
+    margin-top:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button {
+    background:#007aff;
+    color:white;
+    border:none;
+    margin-top:16px;
+}
+
+button:active { background:#005fcc; }
+
+canvas {
+    width:100%;
+    height:300px;
+    margin-top:20px;
+    border:1px solid #ddd;
+    border-radius:12px;
+}
+
+.note { font-size:0.85rem; color:#555; margin-top:10px; text-align:center; }
+</style>
+</head>
+
+<body>
+
+<h2>🔋 Carga Citroën C3 Eléctrico</h2>
+
+<div class="card">
+    <label>Batería actual (%)</label>
+    <input type="number" id="porcentaje" value="30" min="0" max="100">
+
+    <label>Máx amperios a mostrar</label>
+    <input type="number" id="amperiosMax" value="16" min="6" max="16">
+
+    <button onclick="calcular()">Calcular evolución</button>
+
+    <canvas id="grafica"></canvas>
+    <div class="note" id="horaFin"></div>
+</div>
+
+<script>
+const SUBIDA = {6:3, 10:5, 12:6, 16:8}; // %/hora por amperio
+const HORAS_MAX = 16;
+
+function calcular() {
+    const porcentaje = Number(document.getElementById("porcentaje").value);
+    const amperiosMax = Number(document.getElementById("amperiosMax").value);
+    if(isNaN(porcentaje) || porcentaje<0 || porcentaje>100) { alert("Introduce 0-100"); return; }
+    if(isNaN(amperiosMax) || amperiosMax<6 || amperiosMax>16) { alert("Amperios entre 6 y 16"); return; }
+
+    const ahora = new Date();
+    const canvas = document.getElementById("grafica");
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    const ctx = canvas.getContext("2d");
+
+    // Limpiar canvas
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Ejes
+    ctx.strokeStyle="#aaa";
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(40,10); ctx.lineTo(40,canvas.height-30); // Y
+    ctx.lineTo(canvas.width-10,canvas.height-30); // X
+    ctx.stroke();
+
+    // Dibujar porcentajes horizontales
+    ctx.fillStyle="#555";
+    ctx.font="12px sans-serif";
+    for(let i=0;i<=5;i++){
+        const y = canvas.height-30 - i*(canvas.height-40)/5;
+        ctx.fillText((i*20)+"%",0,y+5);
+        ctx.beginPath();
+        ctx.moveTo(40,y);
+        ctx.lineTo(canvas.width-10,y);
+        ctx.strokeStyle="#eee";
+        ctx.stroke();
+    }
+
+    // Dibujar líneas para cada amperaje disponible
+    const colores = {6:"#007aff",10:"#00b300",12:"#ff6600",16:"#ff0000"};
+
+    const amperios = [6,10,12,16].filter(a=>a<=amperiosMax);
+
+    for(let a of amperios){
+        ctx.beginPath();
+        ctx.strokeStyle = colores[a];
+        ctx.lineWidth=2;
+        for(let h=0; h<=HORAS_MAX; h++){
+            const x = 40 + h*(canvas.width-50)/HORAS_MAX;
+            const y = canvas.height-30 - Math.min(porcentaje + h*SUBIDA[a],100)*(canvas.height-40)/100;
+            if(h===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+        // Etiqueta final
+        const yEnd = canvas.height-30 - Math.min(porcentaje + HORAS_MAX*SUBIDA[a],100)*(canvas.height-40)/100;
+        ctx.fillText(a+"A",canvas.width-45,yEnd-5);
+    }
+
+    // Hora aproximada 100% para el amperaje máximo
+    const maxA = Math.max(...amperios);
+    const horasPara100 = Math.ceil((100-porcentaje)/SUBIDA[maxA]);
+    const horaFin = new Date(ahora);
+    horaFin.setHours(horaFin.getHours() + horasPara100);
+    document.getElementById("horaFin").textContent = `Hora aprox. 100% (${maxA} A): ${horaFin.toLocaleTimeString("es-ES",{hour:'2-digit',minute:'2-digit'})}`;
+}
+</script>
+
+</body>
+</html>
