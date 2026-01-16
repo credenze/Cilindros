@@ -87,7 +87,7 @@
     </div>
 
     <div class="info">
-      Aprox. 44 kWh · regla ×0.55<br>
+      Aprox. 44 kWh · regla ×0.453<br>
       Redondea arriba si vas justo
     </div>
   </div>
@@ -109,7 +109,7 @@
         return;
       }
 
-      let kwh = (80 - pct) * 0.55;
+      let kwh = (80 - pct) * 0.453;
       let kwhMostrar = Math.ceil(kwh * 10) / 10; // 1 decimal
 
       res.innerHTML = kwhMostrar + ' kWh' +
