@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Citroën EC3 SOC</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    h1 { color: #333; }
+    p { font-size: 1.3em; }
+  </style>
+</head>
+<body>
+  <h1>Citroën EC3 - Estado de batería</h1>
+  <p><strong>Porcentaje batería:</strong> <span id="soc">Cargando...</span>%</p>
+  <p><strong>Estado de carga:</strong> <span id="status">Cargando...</span></p>
+  <p><strong>Autonomía estimada:</strong> <span id="range">Cargando...</span> km</p>
+
+  <script>
+    // Pega aquí tu Access Token
+    const ACCESS_TOKEN = "5f5ef3fe-6633-40cd-85c9-764b89bb5789";
+    const VIN = "VR7CBZYAXRT210011"; // VIN de tu coche
+
+    async function getCarData() {
+      try {
+        const response = await fetch(`https://api.stellantis.com/v1/vehicles/${VIN}/status`, {
+          headers: {
+            "Authorization": `Bearer ${ACCESS_TOKEN}`
+          }
+        });
+        const data = await response.json();
+        
+        document.getElementById("soc").textContent = data.batteryLevel || 0;
+        document.getElementById("status").textContent = data.chargingStatus || "unknown";
+        document.getElementById("range").textContent = data.range || 0;
+      } catch (err) {
+        console.error(err);
+        document.getElementById("soc").textContent = "Error";
+        document.getElementById("status").textContent = "Error";
+        document.getElementById("range").textContent = "Error";
+      }
+    }
+
+    // Actualiza cada minuto
+    getCarData();
+    setInterval(getCarData, 60000);
+  </script>
+</body>
+</html>
