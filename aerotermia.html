@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Plan Energético Integral - Villanueva</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background: #f0f2f5; margin: 0; padding: 20px; }
+        .card { background: white; max-width: 900px; margin: 0 auto; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        header { text-align: center; border-bottom: 3px solid #27ae60; padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { color: #2c3e50; margin: 0; }
+        h2 { color: #27ae60; border-left: 5px solid #27ae60; padding-left: 15px; margin-top: 30px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .box { background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e1e4e8; }
+        .highlight { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
+        .price-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .price-table th, .price-table td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        .price-table th { background: #f2f2f2; }
+        .total-row { background: #e8f4ec; font-weight: bold; font-size: 1.1em; }
+        .badge { background: #27ae60; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <header>
+        <h1>Propuesta de Autosuficiencia Energética</h1>
+        <p>Villanueva de Santo Adriano | Residencia Habitual</p>
+    </header>
+
+    <h2>1. Componentes del Sistema</h2>
+    <div class="grid">
+        <div class="box">
+            <h3>🔹 Aerotermia (Climatización y ACS)</h3>
+            <ul>
+                <li><strong>Unidad:</strong> Baxi Iridium (Bomba de calor aire-agua).</li>
+                [span_0](start_span)<li><strong>Acumulador:</strong> Depósito de 300 Litros (Especial para 5 personas)[span_0](end_span).</li>
+                <li><strong>Control:</strong> Sistema Smart Grid Ready para conexión con fotovoltaica.</li>
+            </ul>
+        </div>
+        <div class="box">
+            <h3>☀️ Fotovoltaica y Carga EV</h3>
+            <ul>
+                <li><strong>Inversor:</strong> Huawei SUN2000 (Híbrido, preparado para ampliaciones).</li>
+                <li><strong>Paneles:</strong> 6 Módulos Monocristalinos de alta eficiencia (+450W).</li>
+                <li><strong>Cargador:</strong> V2C Trydan (Integración directa con inversor y aerotermia).</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>2. Análisis Económico e Inversión</h2>
+    [span_1](start_span)<p>Basado en presupuesto estimado de 14.700 € y consumo real de febrero (531 kWh)[span_1](end_span).</p>
+    <table class="price-table">
+        <tr>
+            <th>Concepto</th>
+            <th>Importe</th>
+            <th>Estado / Notas</th>
+        </tr>
+        <tr>
+            <td>Inversión Bruta (Aerotermia + Placas)</td>
+            <td>14.700,00 €</td>
+            <td>Presupuesto llave en mano</td>
+        </tr>
+        <tr>
+            <td>Subvención Directa (Estimada Asturias)</td>
+            <td>-3.000,00 €</td>
+            <td>Fondos europeos / autonómicos</td>
+        </tr>
+        <tr>
+            <td>Deducción IRPF (60% sobre base neta)</td>
+            <td>-7.020,00 €</td>
+            <td>Por mejora de eficiencia energética</td>
+        </tr>
+        <tr class="total-row">
+            <td>COSTE NETO FINAL</td>
+            <td>4.680,00 €</td>
+            <td>Recuperación en ~3.5 años</td>
+        </tr>
+    </table>
+
+    <h2>3. Datos Técnicos Estratégicos</h2>
+    <ul>
+        [span_2](start_span)[span_3](start_span)<li><strong>Potencia Recomendada:</strong> Subida a 5,75 kW en periodo Valle (P3) para carga simultánea[span_2](end_span)[span_3](end_span).</li>
+        [span_4](start_span)<li><strong>Precio Energía Crítico:</strong> Aprovechamiento de tu tarifa actual de <strong>0,059 €/kWh</strong> en P3[span_4](end_span).</li>
+        <li><strong>Ahorro en Combustible:</strong> Eliminación del 100% del gasto en Gasoil (~1.400 €/año).</li>
+    </ul>
+
+    <div class="box" style="border-left: 5px solid #f1c40f;">
+        <strong>⚠️ Nota Importante:</strong> Para validar la deducción del 60%, es imprescindible regularizar el contrato con EREDES. [span_5](start_span)Actualmente figura como "No Habitual"[span_5](end_span), y Hacienda exige que sea tu residencia principal para aplicar el beneficio fiscal máximo.
+    </div>
+</div>
+
+</body>
+</html>
