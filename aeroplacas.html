@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Proyecto Energético Integral - Villanueva</title>
+<style>
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f9; padding: 20px; color: #333; }
+    .documento { background: white; max-width: 850px; margin: auto; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border-top: 8px solid #2e7d32; }
+    h1 { color: #1b5e20; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
+    h2 { color: #0d47a1; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+    .resumen-inicial { background: #f1f8e9; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-around; border: 1px solid #c8e6c9; }
+    .dato-principal { text-align: center; }
+    .dato-valor { display: block; font-size: 1.3em; font-weight: bold; color: #2e7d32; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
+    th, td { border: 1px solid #cfd8dc; padding: 12px; text-align: left; }
+    th { background-color: #f5f7f9; }
+    .resaltado { background-color: #e8f5e9; font-weight: bold; }
+    .total-final { background-color: #1b5e20; color: white; font-size: 1.3em; font-weight: bold; }
+    .footer-nota { background: #fff3e0; border-left: 6px solid #ff9800; padding: 20px; margin-top: 30px; font-size: 0.9em; border-radius: 4px; }
+    .badge { background: #0d47a1; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="documento">
+    <h1>Plan de Transición Energética 2026</h1>
+    <p style="text-align: center; font-weight: bold;">VILLANUEVA DE SANTO ADRIANO</p>
+
+    <div class="resumen-inicial">
+        <div class="dato-principal">
+            <span class="dato-valor">531 kWh</span>
+            <span>Consumo Actual (Feb)</span>
+        </div>
+        <div class="dato-principal">
+            <span class="dato-valor">0,059 €/kWh</span>
+            <span>Tarifa Valle (P3)</span>
+        </div>
+        <div class="dato-principal">
+            <span class="dato-valor">100% Eléctrico</span>
+            <span>Objetivo Sin Gasoil</span>
+        </div>
+    </div>
+
+    <h2>1. Inversión Técnica Estimada</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Sistema</th>
+                <th>Descripción de Equipos</th>
+                <th>Presupuesto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Aerotermia</strong></td>
+                <td>Baxi Iridium + Depósito ACS 300L (5 personas)</td>
+                <td>14.700,00 €</td>
+            </tr>
+            <tr>
+                <td><strong>Fotovoltaica</strong> <span class="badge">Estimado</span></td>
+                <td>4.5 kWp (aprox. 10 placas) + Inversor Huawei</td>
+                <td>6.500,00 €</td>
+            </tr>
+            <tr>
+                <td><strong>Cargador EV</strong></td>
+                <td>V2C Trydan (Integración Inteligente)</td>
+                <td>Incluido</td>
+            </tr>
+            <tr class="resaltado">
+                <td colspan="2">TOTAL INVERSIÓN BRUTA</td>
+                <td>21.200,00 €</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Retorno de Inversión y Ayudas Fiscales</h2>
+    <p>Cálculo basado en la normativa fiscal de 2026 para vivienda habitual.</p>
+    <table>
+        <tbody>
+            <tr>
+                <td>Inversión Bruta Total</td>
+                <td>21.200,00 €</td>
+            </tr>
+            <tr>
+                <td>Incentivo CAES (Venta de ahorro de Gasoil)</td>
+                <td>-1.200,00 €</td>
+            </tr>
+            <tr class="resaltado">
+                <td>Base para Deducción IRPF</td>
+                <td>20.000,00 €</td>
+            </tr>
+            <tr>
+                <td><strong>Deducción IRPF (60% del neto)</strong></td>
+                <td><strong>-12.000,00 €</strong></td>
+            </tr>
+            <tr class="total-final">
+                <td>COSTE NETO DEL PROYECTO</td>
+                <td>8.000,00 €</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer-nota">
+        <strong>IMPORTANTE:</strong> El ahorro anual eliminando el gasoil es de aprox. <strong>1.400 €</strong>. Con un coste neto de 8.000 €, la instalación completa se amortiza en <strong>5,7 años</strong>. 
+        <br><br>
+        <strong>REQUISITO:</strong> Para obtener los 12.000 € de devolución de Hacienda, debes cambiar el estado de la vivienda a <strong>"Habitual"</strong> en EREDES. Actualmente consta como "No Habitual", lo que invalidaría la deducción del 60%.
+    </div>
+
+    <h2 style="font-size: 1.1em; color: #555;">Resumen de Beneficios Anuales</h2>
+    <ul>
+        <li><strong>Ahorro Gasoil:</strong> Eliminación de compra de combustible fósil.</li>
+        <li><strong>Eficiencia:</strong> Consumo de la Baxi optimizado con excedentes solares.</li>
+        <li><strong>Coche:</strong> Carga nocturna a precio mínimo (0,059 €) + Carga solar diurna.</li>
+    </ul>
+</div>
+
+</body>
+</html>
