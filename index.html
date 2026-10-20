@@ -19,7 +19,7 @@
   <div class="results" style="max-width:620px">
     <div class="result"><span>Radio de muela</span><output id="wheelRadiusX">450,00</output><span class="unit">mm</span></div>
     <div class="result"><span>Cota X de la máquina</span><output id="xValue">400,00</output><span class="unit">mm</span></div>
-    <div class="result fixed" style="grid-column:1/-1"><span>Diámetro de cilindro calculado</span><output id="cylinderDiameterX">—</output><span class="unit">mm</span></div>
+    <div class="field" style="grid-column:1/-1"><label for="editableCylinderDiameterX">Diámetro de cilindro (mm) · editable</label><input id="editableCylinderDiameterX" type="number" step="0.01" placeholder="Diámetro calculado"></div>
   </div>
   <div class="status" id="statusX" aria-live="polite">Introduce un diámetro de muela válido.</div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px"><button class="reset" id="resetX" type="button">Restaurar valores originales</button><span style="font-size:12px;color:var(--muted)">Restaura la cota X y la máquina seleccionada a sus valores originales.</span></div>
@@ -52,6 +52,7 @@ document.querySelectorAll('input[type=checkbox]').forEach(el=>el.addEventListene
 document.querySelectorAll('[data-reset]').forEach(el=>el.addEventListener('click',()=>reset(Number(el.dataset.reset))));
 
 const originalX={rc1:400,rc3:700,rc4:700};
+let editingCylinderDiameterX=false;
 function calculateDiameterX(){
  const machine=$('machineX').value, diameter=Number($('wheelDiameterX').value), x=Number($('editableX').value);
  const cfg={rc1:{constant:979},rc3:{constant:1322.5},rc4:{constant:1317}}[machine];
@@ -65,11 +66,23 @@ function calculateDiameterX(){
   $('statusX').textContent='Introduce un diámetro de muela mayor que cero.';$('statusX').classList.add('error');return;
  }
  const radius=diameter/2, cylinderDiameter=2*(cfg.constant-(radius+x));
- $('wheelRadiusX').textContent=fmt(radius,2);$('cylinderDiameterX').textContent=fmt(cylinderDiameter,2);
+ $('wheelRadiusX').textContent=fmt(radius,2);
+ if(!editingCylinderDiameterX) $('editableCylinderDiameterX').value=Number.isFinite(cylinderDiameter)?Number(cylinderDiameter.toFixed(2)):'';
  const valid=cylinderDiameter>0;
  $('statusX').textContent=valid?'Cálculo realizado con cota X editable para '+machine.toUpperCase()+'.':'El resultado es cero o negativo; revisa el diámetro introducido y la cota X.';
  $('statusX').classList.toggle('error',!valid);
 }
+$('editableCylinderDiameterX').addEventListener('input',()=>{
+ const machine=$('machineX').value, diameter=Number($('wheelDiameterX').value), cylinderDiameter=Number($('editableCylinderDiameterX').value);
+ const constant={rc1:979,rc3:1322.5,rc4:1317}[machine];
+ if(!Number.isFinite(diameter)||diameter<=0||!Number.isFinite(cylinderDiameter)||cylinderDiameter<=0){
+  $('statusX').textContent='Introduce un diámetro de muela y un diámetro de cilindro mayores que cero.';$('statusX').classList.add('error');return;
+ }
+ const x=constant-(diameter/2)-(cylinderDiameter/2);
+ if(x<0){$('statusX').textContent='Ese diámetro requiere una cota X negativa. Revisa los valores.';$('statusX').classList.add('error');return;}
+ editingCylinderDiameterX=true;$('editableX').value=Number(x.toFixed(2));editingCylinderDiameterX=false;
+ calculateDiameterX();
+});
 function setOriginalX(){
  const machine=$('machineX').value;
  $('editableX').value=originalX[machine];
