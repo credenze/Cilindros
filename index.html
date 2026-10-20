@@ -14,6 +14,7 @@
   <div class="fields" style="max-width:620px">
     <div class="field"><label for="machineX">Máquina</label><select id="machineX" style="width:100%;padding:11px;border:1px solid #3a4c59;border-radius:10px;background:#0a1117;color:var(--text);font:inherit"><option value="rc1">RC1</option><option value="rc3">RC3</option><option value="rc4">RC4</option></select></div>
     <div class="field"><label for="wheelDiameterX">Diámetro de muela (mm)</label><input id="wheelDiameterX" type="number" min="0.001" step="1" value="900" placeholder="Ej. 900"></div>
+    <div class="field"><label for="editableX">Cota X (mm)</label><input id="editableX" type="number" min="0" step="0.1" value="400"></div>
   </div>
   <div class="results" style="max-width:620px">
     <div class="result"><span>Radio de muela</span><output id="wheelRadiusX">450,00</output><span class="unit">mm</span></div>
@@ -21,7 +22,8 @@
     <div class="result fixed" style="grid-column:1/-1"><span>Diámetro de cilindro calculado</span><output id="cylinderDiameterX">—</output><span class="unit">mm</span></div>
   </div>
   <div class="status" id="statusX" aria-live="polite">Introduce un diámetro de muela válido.</div>
-  <div style="font-size:12px;color:var(--muted);margin-top:12px">Fórmula original: diámetro del cilindro = 2 × [constante de máquina − (radio de muela + cota X)]. Comprueba el resultado con las cotas y límites reales de la máquina.</div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px"><button class="reset" id="resetX" type="button">Restaurar valores originales</button><span style="font-size:12px;color:var(--muted)">Restaura la cota X y la máquina seleccionada a sus valores originales.</span></div>
+  <div style="font-size:12px;color:var(--muted);margin-top:12px">Fórmula: diámetro del cilindro = 2 × [constante de máquina − (radio de muela + cota X)]. Comprueba el resultado con las cotas y límites reales de la máquina.</div>
 </section>
 <footer class="footer"><div class="wrap"><b>RectificaPro</b> · Herramienta de apoyo para el taller. Comprueba siempre límites, tolerancias y procedimientos de la máquina antes de aplicar los valores calculados.</div></footer>
 <script>
@@ -49,21 +51,34 @@ document.querySelectorAll('input').forEach(el=>el.addEventListener('input',()=>c
 document.querySelectorAll('input[type=checkbox]').forEach(el=>el.addEventListener('change',()=>calculate(el.id.match(/\d+$/)[0])));
 document.querySelectorAll('[data-reset]').forEach(el=>el.addEventListener('click',()=>reset(Number(el.dataset.reset))));
 
+const originalX={rc1:400,rc3:700,rc4:700};
 function calculateDiameterX(){
- const machine=$('machineX').value, diameter=Number($('wheelDiameterX').value);
- const cfg={rc1:{constant:979,x:400},rc3:{constant:1322.5,x:700},rc4:{constant:1317,x:700}}[machine];
- $('xValue').textContent=fmt(cfg.x,2);
+ const machine=$('machineX').value, diameter=Number($('wheelDiameterX').value), x=Number($('editableX').value);
+ const cfg={rc1:{constant:979},rc3:{constant:1322.5},rc4:{constant:1317}}[machine];
+ $('xValue').textContent=Number.isFinite(x)?fmt(x,2):'—';
+ if(!Number.isFinite(x)||x<0){
+  $('wheelRadiusX').textContent='—';$('cylinderDiameterX').textContent='—';
+  $('statusX').textContent='Introduce una cota X válida (cero o mayor).';$('statusX').classList.add('error');return;
+ }
  if(!Number.isFinite(diameter)||diameter<=0){
   $('wheelRadiusX').textContent='—';$('cylinderDiameterX').textContent='—';
   $('statusX').textContent='Introduce un diámetro de muela mayor que cero.';$('statusX').classList.add('error');return;
  }
- const radius=diameter/2, cylinderDiameter=2*(cfg.constant-(radius+cfg.x));
+ const radius=diameter/2, cylinderDiameter=2*(cfg.constant-(radius+x));
  $('wheelRadiusX').textContent=fmt(radius,2);$('cylinderDiameterX').textContent=fmt(cylinderDiameter,2);
  const valid=cylinderDiameter>0;
- $('statusX').textContent=valid?'Cálculo realizado con las constantes originales de '+machine.toUpperCase()+'.':'El resultado es cero o negativo; revisa el diámetro introducido y la máquina.';
+ $('statusX').textContent=valid?'Cálculo realizado con cota X editable para '+machine.toUpperCase()+'.':'El resultado es cero o negativo; revisa el diámetro introducido y la cota X.';
  $('statusX').classList.toggle('error',!valid);
 }
-$('machineX').addEventListener('change',calculateDiameterX);
+function setOriginalX(){
+ const machine=$('machineX').value;
+ $('editableX').value=originalX[machine];
+ $('wheelDiameterX').value=900;
+ calculateDiameterX();
+}
+$('machineX').addEventListener('change',()=>{$('editableX').value=originalX[$('machineX').value];calculateDiameterX();});
 $('wheelDiameterX').addEventListener('input',calculateDiameterX);
+$('editableX').addEventListener('input',calculateDiameterX);
+$('resetX').addEventListener('click',setOriginalX);
 calculate(1);calculate(2);calculateDiameterX();
 </script></body></html>
