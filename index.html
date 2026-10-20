@@ -14,12 +14,12 @@
   <div class="fields" style="max-width:620px">
     <div class="field"><label for="machineX">Máquina</label><select id="machineX" style="width:100%;padding:11px;border:1px solid #3a4c59;border-radius:10px;background:#0a1117;color:var(--text);font:inherit"><option value="rc1">RC1</option><option value="rc3">RC3</option><option value="rc4">RC4</option></select></div>
     <div class="field"><label for="wheelDiameterX">Diámetro de muela (mm)</label><input id="wheelDiameterX" type="number" min="0.001" step="1" value="900" placeholder="Ej. 900"></div>
-    <div class="field"><label for="editableX">Cota X (mm)</label><input id="editableX" type="number" min="0" step="0.1" value="400"></div>
+    <div class="field"><label for="editableX">Cota X (mm) · editable</label><input id="editableX" type="number" min="0" step="0.1" value="400"></div>
+    <div class="field"><label for="editableCylinderDiameterX">Diámetro de cilindro (mm) · editable</label><input id="editableCylinderDiameterX" type="number" step="0.01" placeholder="Diámetro calculado"></div>
   </div>
   <div class="results" style="max-width:620px">
     <div class="result"><span>Radio de muela</span><output id="wheelRadiusX">450,00</output><span class="unit">mm</span></div>
     <div class="result"><span>Cota X de la máquina</span><output id="xValue">400,00</output><span class="unit">mm</span></div>
-    <div class="field" style="grid-column:1/-1"><label for="editableCylinderDiameterX">Diámetro de cilindro (mm) · editable</label><input id="editableCylinderDiameterX" type="number" step="0.01" placeholder="Diámetro calculado"></div>
   </div>
   <div class="status" id="statusX" aria-live="polite">Introduce un diámetro de muela válido.</div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px"><button class="reset" id="resetX" type="button">Restaurar valores originales</button><span style="font-size:12px;color:var(--muted)">Restaura la cota X y la máquina seleccionada a sus valores originales.</span></div>
